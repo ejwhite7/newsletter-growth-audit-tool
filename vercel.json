@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/generate-audit.js": {
+      "maxDuration": 120
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+} 

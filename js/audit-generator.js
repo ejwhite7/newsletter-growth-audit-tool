@@ -204,18 +204,18 @@ const AuditGenerator = {
             } else {
                 ctaMessage = "You've built an impressive newsletter empire on beehiiv - let our team help you take it to the next level.";
             }
-            ctaButton = "Get beehiiv Expert Support";
+            ctaButton = "Get Started";
         } else {
             ctaTitle = "🚀 Ready to Supercharge Your Growth?";
             ctaMessage = "This audit shows significant opportunities for growth. Join thousands of successful creators who've switched to beehiiv - the platform built specifically for newsletter growth.";
-            ctaButton = "Start Your beehiiv Journey";
+            ctaButton = "Get Started";
         }
         
         return `
             <div class="cta-section">
                 <h3>${ctaTitle}</h3>
                 <p>${ctaMessage}</p>
-                <button type="button" class="btn">${ctaButton}</button>
+                <a href="https://app.beehiiv.com" target="_blank" class="btn">${ctaButton}</a>
             </div>
         `;
     },
@@ -412,7 +412,7 @@ const AuditGenerator = {
             <div class="cta-section">
                 <h3>🚀 Ready to Accelerate Your Growth?</h3>
                 <p>This audit provides a foundation for your newsletter growth strategy. For personalized guidance and advanced strategies, consider working with a newsletter growth expert.</p>
-                <button type="button" class="btn">Get Expert Help</button>
+                <a href="https://app.beehiiv.com" target="_blank" class="btn">Get Started</a>
             </div>
         `;
     },

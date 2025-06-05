@@ -2,10 +2,11 @@
   "name": "newsletter-growth-audit",
   "version": "1.0.0",
   "description": "Newsletter Growth Audit Tool with AI-powered recommendations",
-  "main": "api-proxy.js",
+  "main": "index.html",
   "scripts": {
     "start": "node api-proxy.js",
-    "dev": "nodemon api-proxy.js"
+    "dev": "nodemon api-proxy.js",
+    "build": "echo 'No build step required for static site'"
   },
   "dependencies": {
     "express": "^4.18.2",
@@ -16,12 +17,16 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [
     "newsletter",
     "growth",
     "audit",
     "ai",
-    "anthropic"
+    "anthropic",
+    "vercel"
   ],
   "author": "Your Name",
   "license": "MIT"
