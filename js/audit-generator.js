@@ -781,6 +781,9 @@ const AuditGenerator = {
                 </div>
             `;
 
+            // Track ChiliPiper widget load
+            CustomerIOTracker.trackChilipiperWidgetLoad(formData);
+            
             // Load and execute the Chilipiper script properly
             this.loadAndExecuteChilipiperScript(formData);
         }
@@ -822,6 +825,7 @@ const AuditGenerator = {
                     }
                 } catch (error) {
                     console.error('Error deploying ChiliPiper:', error);
+                    CustomerIOTracker.trackChilipiperFallback(formData, 'deployment_error');
                     this.showChilipiperFallback(formData);
                 }
             }, 1000); // Wait 1 second for ChiliPiper to fully initialize
@@ -829,6 +833,7 @@ const AuditGenerator = {
         
         script.onerror = (error) => {
             console.error('Failed to load ChiliPiper script:', error);
+            CustomerIOTracker.trackChilipiperFallback(formData, 'script_load_error');
             this.showChilipiperFallback(formData);
         };
         
@@ -875,6 +880,9 @@ const AuditGenerator = {
         const submitBtn = document.getElementById('chilipiper-submit-btn');
         if (submitBtn) {
             submitBtn.addEventListener('click', () => {
+                // Track scheduling attempt
+                CustomerIOTracker.trackChilipiperSchedulingAttempt(formData, 'fallback_button');
+                
                 try {
                     if (window.ChiliPiper && window.ChiliPiper.submit) {
                         window.ChiliPiper.submit("beehiiv", "inbound-router", {

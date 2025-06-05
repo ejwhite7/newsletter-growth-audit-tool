@@ -223,6 +223,75 @@ const CustomerIOTracker = {
         }
     },
 
+    // Track ChiliPiper widget interactions
+    trackChilipiperWidgetLoad(formData) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('chilipiper_widget_loaded', {
+                userId: this.userId,
+                subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
+                platform: formData.platform,
+                timestamp: new Date().toISOString(),
+                widget_type: 'scheduling'
+            });
+        } catch (error) {
+            console.error('Customer.io ChiliPiper widget load tracking failed:', error);
+        }
+    },
+
+    // Track ChiliPiper scheduling attempts
+    trackChilipiperSchedulingAttempt(formData, method = 'widget') {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('chilipiper_scheduling_attempt', {
+                userId: this.userId,
+                subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
+                platform: formData.platform,
+                method: method, // 'widget' or 'fallback_button'
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Customer.io ChiliPiper scheduling attempt tracking failed:', error);
+        }
+    },
+
+    // Track ChiliPiper fallback usage
+    trackChilipiperFallback(formData, reason = 'widget_failed') {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('chilipiper_fallback_shown', {
+                userId: this.userId,
+                subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
+                platform: formData.platform,
+                reason: reason, // 'widget_failed', 'script_error', etc.
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Customer.io ChiliPiper fallback tracking failed:', error);
+        }
+    },
+
     // Track form abandonment
     trackFormAbandonment(currentStep, formData) {
         if (window.cioAnalyticsUnavailable) {
