@@ -752,29 +752,43 @@ const AuditGenerator = {
     },
 
     loadChilipiperScript(formData) {
-        // Check if script is already loaded
-        if (document.getElementById('chilipiper-concierge')) {
+        // Check if ChiliPiper is already available
+        if (window.ChiliPiper) {
             this.deployChilipiper(formData);
             return;
         }
 
-        // Create and load the Chilipiper script
-        const script = document.createElement('script');
-        script.id = 'chilipiper-concierge';
-        script.src = 'https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js';
-        script.crossOrigin = 'anonymous';
-        script.type = 'text/javascript';
-        
-        script.onload = () => {
-            this.deployChilipiper(formData);
+        // Wait for the pre-loaded script to finish loading
+        const checkChiliPiper = () => {
+            if (window.ChiliPiper) {
+                this.deployChilipiper(formData);
+            } else {
+                // If ChiliPiper still not available after waiting, show fallback
+                setTimeout(() => {
+                    if (!window.ChiliPiper) {
+                        console.error('ChiliPiper failed to load');
+                        this.showChilipiperFallback(formData);
+                    }
+                }, 5000); // Wait up to 5 seconds total
+            }
         };
-        
-        script.onerror = () => {
-            console.error('Failed to load Chilipiper script');
-            this.showChilipiperFallback(formData);
-        };
-        
-        document.head.appendChild(script);
+
+        // Check every 100ms for up to 5 seconds
+        const interval = setInterval(() => {
+            if (window.ChiliPiper) {
+                clearInterval(interval);
+                this.deployChilipiper(formData);
+            }
+        }, 100);
+
+        // Cleanup interval after 5 seconds
+        setTimeout(() => {
+            clearInterval(interval);
+            if (!window.ChiliPiper) {
+                console.error('ChiliPiper script timeout');
+                this.showChilipiperFallback(formData);
+            }
+        }, 5000);
     },
 
     deployChilipiper(formData) {
