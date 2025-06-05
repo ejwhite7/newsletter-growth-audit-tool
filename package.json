@@ -1,0 +1,28 @@
+{
+  "name": "newsletter-growth-audit",
+  "version": "1.0.0",
+  "description": "Newsletter Growth Audit Tool with AI-powered recommendations",
+  "main": "api-proxy.js",
+  "scripts": {
+    "start": "node api-proxy.js",
+    "dev": "nodemon api-proxy.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.6.7",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "newsletter",
+    "growth",
+    "audit",
+    "ai",
+    "anthropic"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+} 

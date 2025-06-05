@@ -1,0 +1,25 @@
+<!-- Step 5: Tools & Upload Component -->
+<div class="form-step" id="step5">
+    <div class="card">
+        <div class="card__body">
+            <h2>Tools & Additional Information</h2>
+            <p>Final details to complete your audit.</p>
+            
+            <div class="form-group">
+                <label class="form-label" for="additionalTools">Additional Tools You Use</label>
+                <textarea id="additionalTools" class="form-control" rows="4" placeholder="List any analytics, social media, design, or automation tools you currently use..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="newsletterUpload">Upload Latest Newsletter (Optional)</label>
+                <input type="file" id="newsletterUpload" class="form-control" accept=".pdf,.html,.txt">
+                <small class="form-text">Upload your latest newsletter for more detailed feedback</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                <button type="button" class="btn btn--primary" onclick="generateAudit()">Generate My Audit</button>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,70 @@
+<!-- Step 4: Revenue & Monetization Component -->
+<div class="form-step" id="step4">
+    <div class="card">
+        <div class="card__body">
+            <h2>Revenue & Monetization</h2>
+            <p>Help us understand your current monetization approach.</p>
+            
+            <div class="form-group">
+                <label class="form-label" for="monthlyRevenue">Monthly Revenue *</label>
+                <select id="monthlyRevenue" class="form-control" required onchange="toggleCustomRevenueInput()">
+                    <option value="">Select revenue range</option>
+                    <option value="0">$0 (not monetized yet)</option>
+                    <option value="1-100">$1 - $100</option>
+                    <option value="100-500">$100 - $500</option>
+                    <option value="500-1000">$500 - $1,000</option>
+                    <option value="1000-5000">$1,000 - $5,000</option>
+                    <option value="5000-10000">$5,000 - $10,000</option>
+                    <option value="10000+">$10,000+</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="customRevenueGroup" style="display: none;">
+                <label class="form-label" for="customMonthlyRevenue">Enter exact monthly revenue</label>
+                <input type="number" id="customMonthlyRevenue" class="form-control" placeholder="e.g., 25000" min="10000">
+                <small class="form-text">Enter your monthly revenue in USD (without $ sign)</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Monetization Methods</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="ads">
+                        <span>Display Advertising</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="premium">
+                        <span>Premium Subscriptions</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="products">
+                        <span>Product Sales</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="coaching">
+                        <span>Coaching/Consulting</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="affiliate">
+                        <span>Affiliate Marketing</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="sponsors">
+                        <span>Sponsorships</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="monetization" value="none">
+                        <span>None yet</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn--secondary" onclick="prevStep()">Previous</button>
+                <button type="button" class="btn btn--primary" onclick="nextStep()">Next Step</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ 

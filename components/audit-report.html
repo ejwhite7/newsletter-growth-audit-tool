@@ -1,0 +1,23 @@
+<!-- Audit Report Component -->
+<div class="audit-container hidden" id="auditContainer">
+    <div class="card">
+        <div class="card__body">
+            <div class="audit-header">
+                <h1>Your Newsletter Growth Audit</h1>
+                <div class="audit-meta">
+                    <span class="status status--success">Complete</span>
+                    <span class="audit-date" id="auditDate"></span>
+                </div>
+            </div>
+            
+            <div class="audit-content" id="auditContent">
+                <!-- Dynamic audit content will be inserted here -->
+            </div>
+            
+            <div class="audit-actions">
+                <button type="button" class="btn btn--primary" onclick="downloadAudit()">Download PDF</button>
+                <button type="button" class="btn btn--secondary" onclick="restartAudit()">Start New Audit</button>
+            </div>
+        </div>
+    </div>
+</div> 
