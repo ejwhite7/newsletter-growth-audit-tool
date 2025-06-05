@@ -292,6 +292,249 @@ const CustomerIOTracker = {
         }
     },
 
+    // Track social media presence analysis
+    trackSocialMediaAnalysis(formData) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            const socialChannels = formData.socialChannels || [];
+            const totalFollowing = parseInt(formData.totalSocialFollowing) || 0;
+            
+            // Analyze social presence
+            const socialAnalysis = {
+                total_platforms: socialChannels.length,
+                platforms_used: socialChannels.map(ch => ch.platform).join(', '),
+                has_twitter: socialChannels.some(ch => ch.platform === 'twitter'),
+                has_linkedin: socialChannels.some(ch => ch.platform === 'linkedin'),
+                has_instagram: socialChannels.some(ch => ch.platform === 'instagram'),
+                has_tiktok: socialChannels.some(ch => ch.platform === 'tiktok'),
+                has_youtube: socialChannels.some(ch => ch.platform === 'youtube'),
+                has_facebook: socialChannels.some(ch => ch.platform === 'facebook'),
+                total_following: totalFollowing,
+                following_tier: this.categorizeSocialFollowing(totalFollowing),
+                has_no_social: socialChannels.some(ch => ch.platform === 'none')
+            };
+
+            window.cioanalytics.track('social_media_analysis', {
+                userId: this.userId,
+                timestamp: new Date().toISOString(),
+                ...socialAnalysis
+            });
+        } catch (error) {
+            console.error('Customer.io social media analysis tracking failed:', error);
+        }
+    },
+
+    // Track step timing and user behavior
+    trackStepTiming(stepNumber, timeSpent, interactions = {}) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('step_timing_analysis', {
+                userId: this.userId,
+                step_number: stepNumber,
+                time_spent_seconds: timeSpent,
+                time_spent_category: this.categorizeTimeSpent(timeSpent),
+                interactions: interactions,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Customer.io step timing tracking failed:', error);
+        }
+    },
+
+    // Track field-specific interactions
+    trackFieldInteraction(fieldName, action, value = null, stepNumber = null) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('field_interaction', {
+                userId: this.userId,
+                field_name: fieldName,
+                action: action, // 'focus', 'blur', 'change', 'error'
+                value_length: value ? value.toString().length : 0,
+                step_number: stepNumber,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Customer.io field interaction tracking failed:', error);
+        }
+    },
+
+    // Track user engagement patterns
+    trackEngagementPattern(formData) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            const engagement = {
+                has_open_rate: !!(formData.openRate && formData.openRate !== 'Unknown'),
+                has_click_rate: !!(formData.clickRate && formData.clickRate !== 'Unknown'),
+                has_archive_link: !!formData.archiveLink,
+                has_monetization: !!(formData.monetizationMethods && formData.monetizationMethods.length > 0 && !formData.monetizationMethods.includes('none')),
+                has_social_presence: !!(formData.socialChannels && formData.socialChannels.length > 0 && !formData.socialChannels.some(ch => ch.platform === 'none')),
+                has_team: !!(formData.teamSize && formData.teamSize !== 'Just me'),
+                uses_tools: !!(formData.additionalTools && formData.additionalTools.trim() !== ''),
+                engagement_score: this.calculateEngagementScore(formData)
+            };
+
+            window.cioanalytics.track('user_engagement_pattern', {
+                userId: this.userId,
+                timestamp: new Date().toISOString(),
+                ...engagement
+            });
+        } catch (error) {
+            console.error('Customer.io engagement pattern tracking failed:', error);
+        }
+    },
+
+    // Track platform migration potential
+    trackPlatformMigrationPotential(formData) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            const migrationFactors = {
+                current_platform: formData.platform,
+                is_on_beehiiv: formData.platform === 'beehiiv',
+                subscriber_tier: this.determineSubscriberTier(formData.customSubscriberCount || formData.subscriberCount),
+                has_revenue: !!(formData.customMonthlyRevenue || formData.monthlyRevenue),
+                revenue_tier: this.determineRevenueTier(formData.customMonthlyRevenue || formData.monthlyRevenue),
+                migration_likelihood: this.calculateMigrationLikelihood(formData)
+            };
+
+            window.cioanalytics.track('platform_migration_analysis', {
+                userId: this.userId,
+                timestamp: new Date().toISOString(),
+                ...migrationFactors
+            });
+        } catch (error) {
+            console.error('Customer.io platform migration tracking failed:', error);
+        }
+    },
+
+    // Helper functions for categorization
+    categorizeSocialFollowing(following) {
+        if (following === 0) return 'none';
+        if (following < 1000) return 'micro';
+        if (following < 10000) return 'small';
+        if (following < 100000) return 'medium';
+        if (following < 1000000) return 'large';
+        return 'mega';
+    },
+
+    categorizeTimeSpent(seconds) {
+        if (seconds < 30) return 'very_fast';
+        if (seconds < 60) return 'fast';
+        if (seconds < 120) return 'normal';
+        if (seconds < 300) return 'slow';
+        return 'very_slow';
+    },
+
+    determineSubscriberTier(subscriberCount) {
+        if (!subscriberCount) return 'unknown';
+        
+        const count = parseInt(subscriberCount) || 0;
+        if (count < 1000) return 'starter';
+        if (count < 10000) return 'growing';
+        if (count < 100000) return 'established';
+        return 'enterprise';
+    },
+
+    determineRevenueTier(revenue) {
+        if (!revenue) return 'none';
+        
+        const amount = parseInt(revenue) || 0;
+        if (amount === 0) return 'none';
+        if (amount < 1000) return 'low';
+        if (amount < 5000) return 'medium';
+        if (amount < 10000) return 'high';
+        return 'very_high';
+    },
+
+    calculateEngagementScore(formData) {
+        let score = 0;
+        
+        // Basic info completeness (20 points)
+        if (formData.firstName && formData.lastName && formData.email) score += 20;
+        
+        // Newsletter metrics (30 points)
+        if (formData.openRate && formData.openRate !== 'Unknown') score += 15;
+        if (formData.clickRate && formData.clickRate !== 'Unknown') score += 15;
+        
+        // Social presence (20 points)
+        if (formData.socialChannels && formData.socialChannels.length > 0) score += 20;
+        
+        // Monetization (15 points)
+        if (formData.monetizationMethods && formData.monetizationMethods.length > 0) score += 15;
+        
+        // Additional details (15 points)
+        if (formData.archiveLink) score += 5;
+        if (formData.additionalTools) score += 5;
+        if (formData.teamSize && formData.teamSize !== 'Just me') score += 5;
+        
+        return score;
+    },
+
+    calculateMigrationLikelihood(formData) {
+        if (formData.platform === 'beehiiv') return 'already_on_beehiiv';
+        
+        let likelihood = 0;
+        
+        // Higher subscriber count = more likely to migrate
+        const subscriberCount = parseInt(formData.customSubscriberCount || formData.subscriberCount) || 0;
+        if (subscriberCount > 10000) likelihood += 30;
+        else if (subscriberCount > 1000) likelihood += 20;
+        else likelihood += 10;
+        
+        // Revenue indicates serious business
+        const revenue = parseInt(formData.customMonthlyRevenue || formData.monthlyRevenue) || 0;
+        if (revenue > 1000) likelihood += 25;
+        else if (revenue > 0) likelihood += 15;
+        
+        // Social presence indicates growth focus
+        if (formData.socialChannels && formData.socialChannels.length > 2) likelihood += 20;
+        
+        // Team size indicates scaling
+        if (formData.teamSize && formData.teamSize !== 'Just me') likelihood += 15;
+        
+        // Platform limitations
+        if (['Mailchimp', 'Constant Contact'].includes(formData.platform)) likelihood += 10;
+        
+        if (likelihood >= 70) return 'high';
+        if (likelihood >= 50) return 'medium';
+        if (likelihood >= 30) return 'low';
+        return 'very_low';
+    },
+
     // Track form abandonment
     trackFormAbandonment(currentStep, formData) {
         if (window.cioAnalyticsUnavailable) {

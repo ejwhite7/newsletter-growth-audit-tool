@@ -2,6 +2,8 @@
 const StepManager = {
     currentStep: 1,
     totalSteps: 5,
+    stepStartTime: null,
+    stepInteractions: {},
     
     stepComponents: {
         1: 'components/step1-basic-info.html',
@@ -20,8 +22,25 @@ const StepManager = {
     },
 
     showStep(step) {
+        // Track timing for previous step if applicable
+        if (this.stepStartTime && this.currentStep !== step) {
+            const timeSpent = (Date.now() - this.stepStartTime) / 1000;
+            if (window.CustomerIOTracker) {
+                window.CustomerIOTracker.trackStepTiming(this.currentStep, timeSpent, this.stepInteractions);
+            }
+        }
+        
         // Update current step
         this.currentStep = step;
+        
+        // Reset timing and interactions for new step
+        this.stepStartTime = Date.now();
+        this.stepInteractions = {
+            field_focuses: 0,
+            field_changes: 0,
+            validation_errors: 0,
+            button_clicks: 0
+        };
         
         // Remove active class from all steps and add to current step
         const allSteps = document.querySelectorAll('.form-step');
@@ -40,22 +59,104 @@ const StepManager = {
         
         // Update progress
         ProgressManager.updateProgress(step, this.totalSteps);
+        
+        // Set up field interaction tracking for this step
+        this.setupFieldTracking();
     },
 
     async nextStep() {
+        this.stepInteractions.button_clicks++;
+        
         if (FormValidator.validateCurrentStep()) {
             DataCollector.collectStepData(this.currentStep);
             if (this.currentStep < this.totalSteps) {
                 this.currentStep++;
                 await this.loadStep(this.currentStep);
             }
+        } else {
+            this.stepInteractions.validation_errors++;
         }
     },
 
     async prevStep() {
+        this.stepInteractions.button_clicks++;
+        
         if (this.currentStep > 1) {
             this.currentStep--;
             await this.loadStep(this.currentStep);
+        }
+    },
+
+    setupFieldTracking() {
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            const formContainer = document.getElementById('formContainer');
+            if (!formContainer) return;
+            
+            // Track all input, select, and textarea interactions
+            const fields = formContainer.querySelectorAll('input, select, textarea');
+            
+            fields.forEach(field => {
+                // Remove existing listeners to avoid duplicates
+                field.removeEventListener('focus', this.handleFieldFocus);
+                field.removeEventListener('blur', this.handleFieldBlur);
+                field.removeEventListener('change', this.handleFieldChange);
+                field.removeEventListener('input', this.handleFieldInput);
+                
+                // Add new listeners
+                field.addEventListener('focus', this.handleFieldFocus.bind(this));
+                field.addEventListener('blur', this.handleFieldBlur.bind(this));
+                field.addEventListener('change', this.handleFieldChange.bind(this));
+                field.addEventListener('input', this.handleFieldInput.bind(this));
+            });
+        }, 100);
+    },
+
+    handleFieldFocus(event) {
+        this.stepInteractions.field_focuses++;
+        
+        if (window.CustomerIOTracker) {
+            window.CustomerIOTracker.trackFieldInteraction(
+                event.target.name || event.target.id || 'unnamed_field',
+                'focus',
+                event.target.value,
+                this.currentStep
+            );
+        }
+    },
+
+    handleFieldBlur(event) {
+        if (window.CustomerIOTracker) {
+            window.CustomerIOTracker.trackFieldInteraction(
+                event.target.name || event.target.id || 'unnamed_field',
+                'blur',
+                event.target.value,
+                this.currentStep
+            );
+        }
+    },
+
+    handleFieldChange(event) {
+        this.stepInteractions.field_changes++;
+        
+        if (window.CustomerIOTracker) {
+            window.CustomerIOTracker.trackFieldInteraction(
+                event.target.name || event.target.id || 'unnamed_field',
+                'change',
+                event.target.value,
+                this.currentStep
+            );
+        }
+    },
+
+    handleFieldInput(event) {
+        if (window.CustomerIOTracker) {
+            window.CustomerIOTracker.trackFieldInteraction(
+                event.target.name || event.target.id || 'unnamed_field',
+                'input',
+                event.target.value,
+                this.currentStep
+            );
         }
     }
 };

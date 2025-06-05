@@ -23,8 +23,11 @@ const AuditGenerator = {
                 const auditContent = await this.generateAIAudit();
                 this.hideLoading();
                 
-                // Track audit completion and create group with Customer.io
+                // Track audit completion and enhanced analytics with Customer.io
                 CustomerIOTracker.trackAuditCompletion(formData, auditContent);
+                CustomerIOTracker.trackSocialMediaAnalysis(formData);
+                CustomerIOTracker.trackEngagementPattern(formData);
+                CustomerIOTracker.trackPlatformMigrationPotential(formData);
                 
                 // If AI generation failed, auditContent will be null
                 // displayAuditReport will handle this and show the fallback template
@@ -438,8 +441,11 @@ const AuditGenerator = {
         setTimeout(() => {
             this.hideLoading();
             
-            // Track audit completion and create group with Customer.io
+            // Track audit completion and enhanced analytics with Customer.io
             CustomerIOTracker.trackAuditCompletion(formData, null);
+            CustomerIOTracker.trackSocialMediaAnalysis(formData);
+            CustomerIOTracker.trackEngagementPattern(formData);
+            CustomerIOTracker.trackPlatformMigrationPotential(formData);
             
             this.displayAuditReport();
         }, 1000);
