@@ -1,14 +1,14 @@
 
 :root {
   /* Colors - Custom blue with white background and black borders */
-  --color-background: rgba(255, 255, 255, 1);
+  --color-background: rgba(247,245,255);
   --color-surface: rgba(255, 255, 255, 1);
   --color-text: rgba(0, 0, 0, 1);
   --color-text-secondary: rgba(107, 114, 126, 1);
   --color-primary: rgba(47, 57, 186, 1); /* Custom blue #2F39BA */
   --color-primary-hover: rgba(37, 45, 149, 1);
   --color-primary-active: rgba(29, 35, 119, 1);
-  --color-secondary: rgba(248, 250, 252, 1);
+  --color-secondary: rgba(255, 255, 255, 1);
   --color-secondary-hover: rgba(241, 245, 249, 1);
   --color-secondary-active: rgba(226, 232, 240, 1);
   --color-border: rgba(0, 0, 0, 1); /* Black borders */
