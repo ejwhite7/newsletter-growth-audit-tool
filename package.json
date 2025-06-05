@@ -5,8 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "node api-proxy.js",
-    "dev": "nodemon api-proxy.js",
-    "build": "echo 'No build step required for static site'"
+    "dev": "nodemon api-proxy.js"
   },
   "dependencies": {
     "express": "^4.18.2",
