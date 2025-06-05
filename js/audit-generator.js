@@ -7,9 +7,19 @@ const AuditGenerator = {
             
             // Check if user has 100,000+ subscribers - show Chilipiper instead
             const actualSubscriberCount = formData.customSubscriberCount || formData.subscriberCount;
+            console.log('Checking ChiliPiper eligibility:', {
+                customSubscriberCount: formData.customSubscriberCount,
+                subscriberCount: formData.subscriberCount,
+                actualSubscriberCount: actualSubscriberCount,
+                shouldShow: this.shouldShowChilipiper(actualSubscriberCount)
+            });
+            
             if (this.shouldShowChilipiper(actualSubscriberCount)) {
+                console.log('User qualifies for ChiliPiper - showing scheduling page');
                 this.showChilipiperScheduling(formData);
                 return;
+            } else {
+                console.log('User does not qualify for ChiliPiper - proceeding with normal audit');
             }
             
             // Track audit generation start with Customer.io
@@ -683,6 +693,7 @@ const AuditGenerator = {
     },
 
     showChilipiperScheduling(formData) {
+        console.log('showChilipiperScheduling called with:', formData);
         const formContainer = document.getElementById('formContainer');
         const progressContainer = document.getElementById('progressComponent');
         
@@ -717,8 +728,11 @@ const AuditGenerator = {
                 </div>
             `;
             
+            console.log('ChiliPiper container HTML set, loading widget...');
             // Load Chilipiper widget
             this.loadChilipiperWidget(formData);
+        } else {
+            console.error('formContainer not found!');
         }
         
         if (progressContainer) {
@@ -730,24 +744,64 @@ const AuditGenerator = {
     },
 
     loadChilipiperWidget(formData) {
+        console.log('loadChilipiperWidget called');
         const container = document.getElementById('chilipiper-container');
+        console.log('Container found:', container);
+        
         if (container) {
             // Create the Chilipiper container
             container.innerHTML = `
-                <div id="chilipiper-booking-widget" style="min-height: 400px; padding: var(--space-16); border-radius: var(--radius-lg); background: var(--color-surface);">
+                <div id="chilipiper-booking-widget" style="min-height: 400px; padding: var(--space-16); border-radius: var(--radius-lg); background: var(--color-surface); border: 2px solid #ddd;">
                     <div class="loading-chilipiper" style="text-align: center; padding: var(--space-32);">
                         <div class="loading-spinner" style="margin: 0 auto var(--space-16); width: 40px; height: 40px; border: 3px solid var(--color-secondary); border-top: 3px solid var(--color-primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
                         <p style="color: var(--color-text-secondary);">Loading scheduling widget...</p>
+                        <p style="color: var(--color-text-secondary); font-size: 12px; margin-top: 10px;">Debug: Widget container created</p>
                     </div>
+                </div>
+                
+                <!-- Debug section -->
+                <div style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; font-size: 12px;">
+                    <strong>Debug Info:</strong><br>
+                    Account: beehiiv<br>
+                    Router: inbound-router<br>
+                    Container: #chilipiper-booking-widget<br>
+                    <button onclick="window.testChiliPiper()" style="margin-top: 5px; padding: 5px 10px;">Test ChiliPiper Manually</button>
                 </div>
             `;
 
+            // Add a global test function
+            window.testChiliPiper = () => {
+                console.log('Manual ChiliPiper test triggered');
+                if (window.ChiliPiper) {
+                    console.log('ChiliPiper available:', window.ChiliPiper);
+                    try {
+                        window.ChiliPiper.deploy("beehiiv", "inbound-router", {
+                            "formType": "HTML",
+                            "containerSelector": "#chilipiper-booking-widget"
+                        });
+                        console.log('Manual ChiliPiper deploy called');
+                    } catch (error) {
+                        console.error('Manual ChiliPiper deploy failed:', error);
+                    }
+                } else {
+                    console.error('ChiliPiper not available for manual test');
+                }
+            };
+
             // Load and execute the Chilipiper script properly
             this.loadAndExecuteChilipiperScript(formData);
+        } else {
+            console.error('ChiliPiper container not found');
         }
     },
 
     loadAndExecuteChilipiperScript(formData) {
+        // Check if script already exists to avoid duplicates
+        const existingScript = document.getElementById('chilipiper-concierge');
+        if (existingScript) {
+            existingScript.remove();
+        }
+
         // Create script element
         const script = document.createElement('script');
         script.id = 'chilipiper-concierge';
@@ -756,36 +810,52 @@ const AuditGenerator = {
         script.type = 'text/javascript';
         
         script.onload = () => {
-            // Once ChiliPiper script is loaded, deploy it
-            try {
-                // Hide loading indicator
-                const loadingElement = document.querySelector('.loading-chilipiper');
-                if (loadingElement) {
-                    loadingElement.style.display = 'none';
-                }
+            // Wait a bit for ChiliPiper to fully initialize
+            setTimeout(() => {
+                try {
+                    // Hide loading indicator
+                    const loadingElement = document.querySelector('.loading-chilipiper');
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
 
-                // Deploy ChiliPiper
-                if (window.ChiliPiper && window.ChiliPiper.deploy) {
-                    window.ChiliPiper.deploy("beehiiv", "inbound-router", {
-                        "formType": "HTML"
-                    });
-                } else {
-                    // If deploy doesn't work, show fallback
+                    // Deploy ChiliPiper with proper configuration
+                    if (window.ChiliPiper && window.ChiliPiper.deploy) {
+                        console.log('Deploying ChiliPiper widget...');
+                        window.ChiliPiper.deploy("beehiiv", "inbound-router", {
+                            "formType": "HTML",
+                            "containerSelector": "#chilipiper-booking-widget",
+                            "leadInfo": {
+                                "firstName": formData.firstName || "",
+                                "lastName": formData.lastName || "",
+                                "email": formData.email || "",
+                                "subscribers": formData.customSubscriberCount || formData.subscriberCount || "",
+                                "platform": formData.platform || "",
+                                "newsletterName": formData.newsletterName || "",
+                                "website": formData.archiveLink || "",
+                                "source": "newsletter_audit_tool_enterprise"
+                            }
+                        });
+                        console.log('ChiliPiper widget deployed successfully');
+                    } else {
+                        console.error('ChiliPiper.deploy not available');
+                        this.showChilipiperFallback(formData);
+                    }
+                } catch (error) {
+                    console.error('Error deploying ChiliPiper:', error);
                     this.showChilipiperFallback(formData);
                 }
-            } catch (error) {
-                console.error('Error deploying ChiliPiper:', error);
-                this.showChilipiperFallback(formData);
-            }
+            }, 1000); // Wait 1 second for ChiliPiper to fully initialize
         };
         
-        script.onerror = () => {
-            console.error('Failed to load ChiliPiper script');
+        script.onerror = (error) => {
+            console.error('Failed to load ChiliPiper script:', error);
             this.showChilipiperFallback(formData);
         };
         
         // Add script to head
         document.head.appendChild(script);
+        console.log('ChiliPiper script added to page');
     },
 
 
