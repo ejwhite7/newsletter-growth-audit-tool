@@ -53,12 +53,30 @@ const DataCollector = {
     },
 
     collectSocialTeam() {
+        // Collect dynamic social media channels
+        const socialChannels = [];
+        const channelItems = document.querySelectorAll('.social-channel-item');
+        
+        channelItems.forEach(item => {
+            const platformSelect = item.querySelector('select');
+            const handleInput = item.querySelector('input[type="text"]');
+            
+            if (platformSelect && platformSelect.value) {
+                socialChannels.push({
+                    platform: platformSelect.value,
+                    handle: handleInput ? handleInput.value : ''
+                });
+            }
+        });
+        
         const stepData = {
-            twitterHandle: document.getElementById('twitterHandle')?.value || '',
-            linkedinHandle: document.getElementById('linkedinHandle')?.value || '',
-            instagramHandle: document.getElementById('instagramHandle')?.value || '',
-            tiktokHandle: document.getElementById('tiktokHandle')?.value || '',
-            teamSize: document.getElementById('teamSize')?.value || ''
+            socialChannels: socialChannels,
+            totalSocialFollowing: document.getElementById('totalSocialFollowing')?.value || '0',
+            // Legacy fields for backwards compatibility
+            twitterHandle: socialChannels.find(ch => ch.platform === 'twitter')?.handle || '',
+            linkedinHandle: socialChannels.find(ch => ch.platform === 'linkedin')?.handle || '',
+            instagramHandle: socialChannels.find(ch => ch.platform === 'instagram')?.handle || '',
+            tiktokHandle: socialChannels.find(ch => ch.platform === 'tiktok')?.handle || ''
         };
         
         Object.assign(this.formData, stepData);
@@ -74,6 +92,7 @@ const DataCollector = {
         const stepData = {
             monthlyRevenue: document.getElementById('monthlyRevenue')?.value || '',
             customMonthlyRevenue: document.getElementById('customMonthlyRevenue')?.value || '',
+            teamSize: document.getElementById('teamSize')?.value || '',
             monetizationMethods: monetizationMethods
         };
         

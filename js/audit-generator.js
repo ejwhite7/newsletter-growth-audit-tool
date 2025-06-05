@@ -5,6 +5,13 @@ const AuditGenerator = {
             DataCollector.collectStepData(StepManager.currentStep);
             const formData = DataCollector.getFormData();
             
+            // Check if user has 100,000+ subscribers - show Chilipiper instead
+            const actualSubscriberCount = formData.customSubscriberCount || formData.subscriberCount;
+            if (this.shouldShowChilipiper(actualSubscriberCount)) {
+                this.showChilipiperScheduling(formData);
+                return;
+            }
+            
             // Track audit generation start with Customer.io
             CustomerIOTracker.trackAuditGenerationStart(formData);
             
@@ -228,19 +235,116 @@ const AuditGenerator = {
             formContainer.innerHTML = `
                 <div class="card">
                     <div class="card__body">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
+                        <div class="audit-loading-container">
+                            <div class="audit-progress-ring">
+                                <svg class="progress-ring" width="120" height="120">
+                                    <circle class="progress-ring-circle" 
+                                            stroke="var(--color-primary)" 
+                                            stroke-width="4" 
+                                            fill="transparent" 
+                                            r="52" 
+                                            cx="60" 
+                                            cy="60"
+                                            stroke-dasharray="326.7256637168141"
+                                            stroke-dashoffset="326.7256637168141"/>
+                                </svg>
+                                <div class="progress-percentage">0%</div>
+                            </div>
                         </div>
-                        <h2 style="text-align: center; margin-top: 16px;">Generating Your Comprehensive Audit...</h2>
-                        <p style="text-align: center; color: var(--color-text-secondary);">Analyzing your newsletter data across 9 key areas and creating personalized AI-powered recommendations. This is audit is 100% unique to you and may take up to 2 minutes to build.</p>
+                        <h2 style="text-align: center; margin-top: 24px;">Generating Your Comprehensive Audit...</h2>
+                        <div class="loading-steps">
+                            <div class="loading-step active" data-step="1">
+                                <span class="step-icon">📊</span>
+                                <span class="step-text">Analyzing newsletter metrics</span>
+                            </div>
+                            <div class="loading-step" data-step="2">
+                                <span class="step-icon">🎯</span>
+                                <span class="step-text">Identifying growth opportunities</span>
+                            </div>
+                            <div class="loading-step" data-step="3">
+                                <span class="step-icon">💡</span>
+                                <span class="step-text">Generating AI recommendations</span>
+                            </div>
+                            <div class="loading-step" data-step="4">
+                                <span class="step-icon">📈</span>
+                                <span class="step-text">Creating action plan</span>
+                            </div>
+                            <div class="loading-step" data-step="5">
+                                <span class="step-icon">✨</span>
+                                <span class="step-text">Finalizing your report</span>
+                            </div>
+                        </div>
+                        <p style="text-align: center; color: var(--color-text-secondary); margin-top: 16px;">
+                            Analyzing your newsletter data across 9 key areas and creating personalized recommendations.
+                        </p>
                     </div>
                 </div>
             `;
+            
+            // Start the loading animation
+            this.startLoadingAnimation();
         }
         
         if (progressContainer) {
             progressContainer.style.display = 'none';
         }
+    },
+
+    startLoadingAnimation() {
+        const circle = document.querySelector('.progress-ring-circle');
+        const percentageEl = document.querySelector('.progress-percentage');
+        const steps = document.querySelectorAll('.loading-step');
+        
+        if (!circle || !percentageEl) return;
+        
+        const circumference = 2 * Math.PI * 52; // radius = 52
+        const duration = 120000; // 2 minutes in milliseconds
+        const stepDuration = duration / 5; // Duration per step
+        const updateInterval = 100; // Update every 100ms for smooth animation
+        
+        let startTime = Date.now();
+        let currentStep = 0;
+        
+        const updateProgress = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const percentage = Math.floor(progress * 100);
+            
+            // Update circular progress
+            const offset = circumference - (progress * circumference);
+            circle.style.strokeDashoffset = offset;
+            percentageEl.textContent = `${percentage}%`;
+            
+            // Update steps
+            const newStep = Math.floor(elapsed / stepDuration);
+            if (newStep !== currentStep && newStep < steps.length) {
+                // Remove active from previous step
+                if (steps[currentStep]) {
+                    steps[currentStep].classList.remove('active');
+                    steps[currentStep].classList.add('completed');
+                }
+                
+                // Add active to current step
+                if (steps[newStep]) {
+                    steps[newStep].classList.add('active');
+                }
+                
+                currentStep = newStep;
+            }
+            
+            // Continue animation if not complete
+            if (progress < 1) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                // Mark all steps as completed
+                steps.forEach(step => {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                });
+            }
+        };
+        
+        updateProgress();
     },
 
     hideLoading() {
@@ -370,7 +474,7 @@ const AuditGenerator = {
                         <p class="metric-value">${formData.teamSize}</p>
                     </div>
                 </div>
-                ${formData.openRate ? `
+                ${formData.openRate && formData.openRate !== '' ? `
                 <div class="audit-grid">
                     <div class="audit-metric">
                         <h4>Open Rate</h4>
@@ -378,7 +482,7 @@ const AuditGenerator = {
                     </div>
                     <div class="audit-metric">
                         <h4>Click Rate</h4>
-                        <p class="metric-value">${formData.clickRate}</p>
+                        <p class="metric-value">${formData.clickRate || 'Not provided'}</p>
                     </div>
                 </div>
                 ` : ''}
@@ -435,7 +539,7 @@ const AuditGenerator = {
             return 'starter';
         } else if (count.includes('2500-5000') || count.includes('5000-10000')) {
             return 'growing';
-        } else if (count.includes('10000-25000') || count.includes('25000-50000') || count.includes('50000-100000')) {
+        } else if (count.includes('10000-25000') || count.includes('25000-50000') || count.includes('50000-60000') || count.includes('60000-70000') || count.includes('70000-80000') || count.includes('80000-90000') || count.includes('90000-100000')) {
             return 'established';
         } else {
             return 'enterprise';
@@ -553,6 +657,88 @@ const AuditGenerator = {
                     <li><span class="step-number">5</span>Implement one new growth tactic from recommendations</li>
                 </ol>
             </div>`;
+    },
+
+    shouldShowChilipiper(subscriberCount) {
+        // Check if subscriber count indicates 100,000+ subscribers
+        if (!subscriberCount) return false;
+        
+        // Handle custom numeric input
+        if (!isNaN(subscriberCount)) {
+            const count = parseInt(subscriberCount);
+            return count >= 100000;
+        }
+        
+        // Handle range selections
+        const count = subscriberCount.toLowerCase();
+        return count.includes('100000+');
+    },
+
+    showChilipiperScheduling(formData) {
+        const formContainer = document.getElementById('formContainer');
+        const progressContainer = document.getElementById('progressComponent');
+        
+        if (formContainer) {
+            formContainer.innerHTML = `
+                <div class="card">
+                    <div class="card__body" style="text-align: center; padding: var(--space-32);">
+                        <h2>🚀 Premium Growth Strategy Session</h2>
+                        <p style="font-size: var(--font-size-lg); color: var(--color-text-secondary); margin-bottom: var(--space-24);">
+                            With 100,000+ subscribers, you've built something incredible! Our team will manually compile a custom growth strategy and review the results with you personally.
+                        </p>
+                        
+                        <div style="background: var(--color-secondary); padding: var(--space-24); border-radius: var(--radius-lg); margin-bottom: var(--space-24);">
+                            <h3 style="margin-bottom: var(--space-16);">What You'll Get:</h3>
+                            <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+                                <li>Custom growth strategy analysis</li>
+                                <li>Personalized optimization recommendations</li>
+                                <li>Direct consultation with a growth expert</li>
+                                <li>Advanced monetization strategies</li>
+                                <li>Enterprise-level growth tactics</li>
+                            </ul>
+                        </div>
+                        
+                        <div id="chilipiper-container">
+                            <!-- Chilipiper widget will be loaded here -->
+                        </div>
+                        
+                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                            Book a time to review your custom growth strategy with one of our experts.
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            // Load Chilipiper widget
+            this.loadChilipiperWidget(formData);
+        }
+        
+        if (progressContainer) {
+            progressContainer.style.display = 'none';
+        }
+        
+        // Track enterprise user with Customer.io
+        CustomerIOTracker.trackEnterpriseUser(formData);
+    },
+
+    loadChilipiperWidget(formData) {
+        // For now, show a placeholder for the Chilipiper widget
+        // In production, you would integrate with actual Chilipiper code
+        const container = document.getElementById('chilipiper-container');
+        if (container) {
+            container.innerHTML = `
+                <div style="border: 2px dashed var(--color-primary); padding: var(--space-24); border-radius: var(--radius-lg); background: rgba(var(--color-primary-rgb), 0.05);">
+                    <h4 style="color: var(--color-primary); margin-bottom: var(--space-12);">📅 Schedule Your Strategy Session</h4>
+                    <p style="margin-bottom: var(--space-16); color: var(--color-text-secondary);">
+                        Chilipiper scheduling widget would be embedded here.<br>
+                        User: ${formData.firstName} ${formData.lastName} (${formData.email})
+                    </p>
+                    <a href="https://calendly.com/your-booking-link" target="_blank" class="btn btn--primary">
+                        Schedule Strategy Session
+                    </a>
+                </div>
+            `;
+        }
     }
 };
 

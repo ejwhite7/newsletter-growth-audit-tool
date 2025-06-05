@@ -6,6 +6,19 @@ window.nextStep = () => StepManager.nextStep();
 window.prevStep = () => StepManager.prevStep();
 window.generateAudit = () => AuditGenerator.generateAudit();
 
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize abandonment tracking
+    if (window.CustomerIOTracker) {
+        CustomerIOTracker.initializeAbandonmentTracking();
+    }
+    
+    // Initialize component loading
+    if (window.ComponentLoader) {
+        ComponentLoader.loadInitialComponent();
+    }
+});
+
 // Custom input toggle functions
 window.toggleCustomSubscriberInput = () => {
     const subscriberSelect = document.getElementById('subscriberCount');
@@ -38,6 +51,117 @@ window.toggleCustomRevenueInput = () => {
             customInput.required = false;
             customInput.value = '';
         }
+    }
+};
+
+// Social Media Functions
+let socialChannelCounter = 0;
+
+window.addSocialChannel = () => {
+    const container = document.getElementById('socialChannelsList');
+    const followingGroup = document.getElementById('socialFollowingGroup');
+    
+    socialChannelCounter++;
+    
+    const channelItem = document.createElement('div');
+    channelItem.className = 'social-channel-item';
+    channelItem.id = `social-channel-${socialChannelCounter}`;
+    
+    channelItem.innerHTML = `
+        <select class="form-control" id="platform-${socialChannelCounter}" onchange="updateSocialFollowingVisibility()">
+            <option value="">Select platform</option>
+            <option value="twitter">Twitter/X</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="youtube">YouTube</option>
+            <option value="facebook">Facebook</option>
+            <option value="none">No Social Presence</option>
+        </select>
+        <input type="text" class="form-control" id="handle-${socialChannelCounter}" placeholder="@username or profile URL" style="display: none;">
+        <button type="button" class="btn btn--remove-social" onclick="removeSocialChannel(${socialChannelCounter})">Remove</button>
+    `;
+    
+    container.appendChild(channelItem);
+    
+    // Add event listener to show/hide input based on selection
+    const platformSelect = document.getElementById(`platform-${socialChannelCounter}`);
+    const handleInput = document.getElementById(`handle-${socialChannelCounter}`);
+    
+    platformSelect.addEventListener('change', function() {
+        if (this.value && this.value !== 'none') {
+            handleInput.style.display = 'block';
+            handleInput.required = true;
+            
+            // Update placeholder based on platform
+            const placeholders = {
+                twitter: '@username',
+                linkedin: 'https://linkedin.com/in/username',
+                instagram: '@username',
+                tiktok: '@username',
+                youtube: 'Channel URL or @handle',
+                facebook: 'Page URL or @handle'
+            };
+            handleInput.placeholder = placeholders[this.value] || '@username or profile URL';
+        } else {
+            handleInput.style.display = 'none';
+            handleInput.required = false;
+            handleInput.value = '';
+        }
+        updateSocialFollowingVisibility();
+    });
+};
+
+window.removeSocialChannel = (id) => {
+    const channelItem = document.getElementById(`social-channel-${id}`);
+    if (channelItem) {
+        channelItem.remove();
+        updateSocialFollowingVisibility();
+    }
+};
+
+window.updateSocialFollowingVisibility = () => {
+    const channels = document.querySelectorAll('.social-channel-item select');
+    const followingGroup = document.getElementById('socialFollowingGroup');
+    
+    let hasSocialChannels = false;
+    let hasNoSocialPresence = false;
+    
+    channels.forEach(select => {
+        if (select.value) {
+            if (select.value === 'none') {
+                hasNoSocialPresence = true;
+            } else {
+                hasSocialChannels = true;
+            }
+        }
+    });
+    
+    // Show following slider only if user has social channels (not "No Social Presence")
+    if (hasSocialChannels && !hasNoSocialPresence) {
+        followingGroup.style.display = 'block';
+    } else {
+        followingGroup.style.display = 'none';
+    }
+};
+
+window.updateFollowingDisplay = (value) => {
+    const valueDisplay = document.getElementById('followingValue');
+    if (valueDisplay) {
+        const numValue = parseInt(value);
+        let displayValue;
+        
+        if (numValue === 0) {
+            displayValue = '0 followers';
+        } else if (numValue < 1000) {
+            displayValue = `${numValue} followers`;
+        } else if (numValue < 1000000) {
+            displayValue = `${Math.round(numValue / 1000)}K followers`;
+        } else {
+            displayValue = `${Math.round(numValue / 1000000)}M+ followers`;
+        }
+        
+        valueDisplay.textContent = displayValue;
     }
 };
 

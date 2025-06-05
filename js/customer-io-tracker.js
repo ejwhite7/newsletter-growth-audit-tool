@@ -195,6 +195,32 @@ const CustomerIOTracker = {
         }
     },
 
+    // Track enterprise user (100k+ subscribers)
+    trackEnterpriseUser(formData) {
+        if (window.cioAnalyticsUnavailable) {
+            return;
+        }
+        
+        if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
+            return;
+        }
+
+        try {
+            window.cioanalytics.track('enterprise_user_identified', {
+                userId: this.userId,
+                subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
+                monthly_revenue: formData.customMonthlyRevenue || formData.monthlyRevenue,
+                platform: formData.platform,
+                timestamp: new Date().toISOString(),
+                user_type: 'enterprise',
+                requires_manual_audit: true,
+                scheduling_widget_shown: true
+            });
+        } catch (error) {
+            console.error('Customer.io enterprise user tracking failed:', error);
+        }
+    },
+
     // Track form abandonment
     trackFormAbandonment(currentStep, formData) {
         if (window.cioAnalyticsUnavailable) {
