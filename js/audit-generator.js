@@ -232,7 +232,7 @@ const AuditGenerator = {
                             <div class="loading-spinner"></div>
                         </div>
                         <h2 style="text-align: center; margin-top: 16px;">Generating Your Comprehensive Audit...</h2>
-                        <p style="text-align: center; color: var(--color-text-secondary);">Analyzing your newsletter data across 9 key areas and creating personalized AI-powered recommendations. This may take a few moments.</p>
+                        <p style="text-align: center; color: var(--color-text-secondary);">Analyzing your newsletter data across 9 key areas and creating personalized AI-powered recommendations. This is audit is 100% unique to you and may take up to 2 minutes to build.</p>
                     </div>
                 </div>
             `;

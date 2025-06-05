@@ -16,6 +16,7 @@ Generate a warm, personalized welcome message that:
 3. Sets expectations for the comprehensive audit
 4. Is encouraging and professional
 5. Keep it concise but warm and professional
+6. Speak from a perspective of the growth team at beehiiv, using "We" rather and "I" when communicating with the user.
 </instructions>
 
 <output_format>

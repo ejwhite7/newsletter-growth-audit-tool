@@ -16,6 +16,8 @@ Create a metrics overview section that displays the key stats in a grid format. 
 
 Focus on providing context for what these numbers mean in the newsletter industry.
 
+Speak from a perspective of the growth team at beehiiv, using "We" rather and "I" when communicating with the user.
+
 IMPORTANT: Only use the actual data provided. DO NOT calculate or mention conversion rates, subscriber-to-paid ratios, or any other metrics not explicitly provided in the user data.
 </instructions>
 
