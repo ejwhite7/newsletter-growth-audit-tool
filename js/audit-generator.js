@@ -732,8 +732,35 @@ const AuditGenerator = {
     loadChilipiperWidget(formData) {
         const container = document.getElementById('chilipiper-container');
         if (container) {
-            // Create the Chilipiper container with better styling for visibility
+            // Helper function to escape HTML attributes
+            const escapeHtml = (text) => {
+                if (!text) return '';
+                return text.toString()
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            };
+
+            // Create the Chilipiper container with hidden form and widget area
             container.innerHTML = `
+                <!-- Hidden form for ChiliPiper to read from -->
+                <form id="chilipiper-form" style="display: none;">
+                    <input type="text" name="firstName" value="${escapeHtml(formData.firstName)}" />
+                    <input type="text" name="lastName" value="${escapeHtml(formData.lastName)}" />
+                    <input type="email" name="email" value="${escapeHtml(formData.email)}" />
+                    <input type="text" name="subscribers" value="${escapeHtml(formData.customSubscriberCount || formData.subscriberCount)}" />
+                    <input type="text" name="platform" value="${escapeHtml(formData.platform)}" />
+                    <input type="text" name="name" value="${escapeHtml(formData.newsletterName)}" />
+                    <input type="text" name="website" value="${escapeHtml(formData.archiveLink)}" />
+                    <input type="text" name="source" value="newsletter_audit_tool_enterprise" />
+                    <input type="text" name="monthlyRevenue" value="${escapeHtml(formData.customMonthlyRevenue || formData.monthlyRevenue)}" />
+                    <input type="text" name="teamSize" value="${escapeHtml(formData.teamSize)}" />
+                    <input type="text" name="openRate" value="${escapeHtml(formData.openRate)}" />
+                    <input type="text" name="clickRate" value="${escapeHtml(formData.clickRate)}" />
+                </form>
+                
                 <div id="chilipiper-booking-widget" style="
                     min-height: 600px; 
                     width: 100%; 
@@ -787,17 +814,8 @@ const AuditGenerator = {
                     if (window.ChiliPiper && window.ChiliPiper.deploy) {
                         window.ChiliPiper.deploy("beehiiv", "inbound-router", {
                             "formType": "HTML",
-                            "containerSelector": "#chilipiper-booking-widget",
-                            "leadInfo": {
-                                "firstName": formData.firstName || "",
-                                "lastName": formData.lastName || "",
-                                "email": formData.email || "",
-                                "subscribers": formData.customSubscriberCount || formData.subscriberCount || "",
-                                "platform": formData.platform || "",
-                                "newsletterName": formData.newsletterName || "",
-                                "website": formData.archiveLink || "",
-                                "source": "newsletter_audit_tool_enterprise"
-                            }
+                            "formSelector": "#chilipiper-form",
+                            "containerSelector": "#chilipiper-booking-widget"
                         });
                     } else {
                         this.showChilipiperFallback(formData);
