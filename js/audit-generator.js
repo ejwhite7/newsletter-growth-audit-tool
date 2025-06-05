@@ -732,100 +732,21 @@ const AuditGenerator = {
     loadChilipiperWidget(formData) {
         const container = document.getElementById('chilipiper-container');
         if (container) {
-            // Create the Chilipiper container
+            // Create the Chilipiper container with embedded script
             container.innerHTML = `
                 <div id="chilipiper-booking-widget" style="min-height: 400px; padding: var(--space-16); border-radius: var(--radius-lg); background: var(--color-surface);">
-                    <div class="loading-chilipiper" style="text-align: center; padding: var(--space-32);">
-                        <div class="loading-spinner" style="margin: 0 auto var(--space-16); width: 40px; height: 40px; border: 3px solid var(--color-secondary); border-top: 3px solid var(--color-primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="color: var(--color-text-secondary);">Loading scheduling widget...</p>
-                    </div>
+                    <script id="chilipiper-concierge" src="https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js" crossorigin="anonymous" type="text/javascript"></script>
+                    <script>
+                      ChiliPiper.deploy("beehiiv", "inbound-router", {
+                        "formType": "HTML"
+                      })
+                    </script>
                 </div>
             `;
-            
-            // Load Chilipiper script if not already loaded
-            if (!window.ChiliPiper) {
-                this.loadChilipiperScript(formData);
-            } else {
-                this.deployChilipiper(formData);
-            }
         }
     },
 
-    loadChilipiperScript(formData) {
-        // Check if ChiliPiper is already available
-        if (window.ChiliPiper) {
-            this.deployChilipiper(formData);
-            return;
-        }
 
-        // Wait for the pre-loaded script to finish loading
-        const checkChiliPiper = () => {
-            if (window.ChiliPiper) {
-                this.deployChilipiper(formData);
-            } else {
-                // If ChiliPiper still not available after waiting, show fallback
-                setTimeout(() => {
-                    if (!window.ChiliPiper) {
-                        console.error('ChiliPiper failed to load');
-                        this.showChilipiperFallback(formData);
-                    }
-                }, 5000); // Wait up to 5 seconds total
-            }
-        };
-
-        // Check every 100ms for up to 5 seconds
-        const interval = setInterval(() => {
-            if (window.ChiliPiper) {
-                clearInterval(interval);
-                this.deployChilipiper(formData);
-            }
-        }, 100);
-
-        // Cleanup interval after 5 seconds
-        setTimeout(() => {
-            clearInterval(interval);
-            if (!window.ChiliPiper) {
-                console.error('ChiliPiper script timeout');
-                this.showChilipiperFallback(formData);
-            }
-        }, 5000);
-    },
-
-    deployChilipiper(formData) {
-        try {
-            // Wait a moment for ChiliPiper to be fully loaded
-            setTimeout(() => {
-                if (window.ChiliPiper && window.ChiliPiper.deploy) {
-                    // Deploy Chilipiper with user data
-                    window.ChiliPiper.deploy("beehiiv", "inbound-router", {
-                        "formType": "HTML",
-                        "leadInfo": {
-                            "firstName": formData.firstName,
-                            "lastName": formData.lastName,
-                            "email": formData.email,
-                            "subscribers": formData.customSubscriberCount || formData.subscriberCount,
-                            "platform": formData.platform,
-                            "newsletterName": formData.newsletterName,
-                            "website": formData.archiveLink,
-                            "source": "newsletter_audit_tool_enterprise"
-                        },
-                        "containerSelector": "#chilipiper-booking-widget"
-                    });
-                    
-                    // Hide loading indicator
-                    const loadingElement = document.querySelector('.loading-chilipiper');
-                    if (loadingElement) {
-                        loadingElement.style.display = 'none';
-                    }
-                } else {
-                    throw new Error('ChiliPiper not available');
-                }
-            }, 500);
-        } catch (error) {
-            console.error('Error deploying Chilipiper:', error);
-            this.showChilipiperFallback(formData);
-        }
-    },
 
     showChilipiperFallback(formData) {
         const container = document.getElementById('chilipiper-booking-widget');
@@ -852,70 +773,29 @@ const AuditGenerator = {
                        class="btn btn--secondary" style="font-size: var(--font-size-sm);">
                         Or Email Our Team
                     </a>
+                    
+                    <script id="chilipiper-concierge" src="https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js" crossorigin="anonymous" type="text/javascript"></script>
+                    <script>
+                      document.getElementById('chilipiper-submit-btn').addEventListener('click', function() {
+                        ChiliPiper.submit("beehiiv", "inbound-router", {
+                          trigger: 'ThirdPartyForm', 
+                          lead: {
+                            "firstname": "${formData.firstName || ""}", 
+                            "lastname": "${formData.lastName || ""}", 
+                            "subscribers": "${formData.customSubscriberCount || formData.subscriberCount || ""}", 
+                            "platform": "${formData.platform || ""}", 
+                            "name": "${formData.newsletterName || ""}", 
+                            "website": "${formData.archiveLink || ""}"
+                          }
+                        });
+                      });
+                    </script>
                 </div>
             `;
-            
-            // Load Chilipiper script and set up submit functionality
-            this.loadChilipiperSubmitScript(formData);
         }
     },
 
-    loadChilipiperSubmitScript(formData) {
-        // Check if script is already loaded
-        if (document.getElementById('chilipiper-concierge')) {
-            this.setupChilipiperSubmit(formData);
-            return;
-        }
 
-        // Create and load the Chilipiper script
-        const script = document.createElement('script');
-        script.id = 'chilipiper-concierge';
-        script.src = 'https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js';
-        script.crossOrigin = 'anonymous';
-        script.type = 'text/javascript';
-        
-        script.onload = () => {
-            this.setupChilipiperSubmit(formData);
-        };
-        
-        script.onerror = () => {
-            console.error('Failed to load Chilipiper script for submit');
-            // Keep the email fallback available
-        };
-        
-        document.head.appendChild(script);
-    },
-
-    setupChilipiperSubmit(formData) {
-        const submitBtn = document.getElementById('chilipiper-submit-btn');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => {
-                try {
-                    if (window.ChiliPiper && window.ChiliPiper.submit) {
-                        window.ChiliPiper.submit("beehiiv", "inbound-router", {
-                            trigger: 'ThirdPartyForm',
-                            lead: {
-                                "firstname": formData.firstName || "",
-                                "lastname": formData.lastName || "",
-                                "email": formData.email || "",
-                                "phone": "", // No phone field in our form
-                                "subscribers": formData.customSubscriberCount || formData.subscriberCount || "",
-                                "platform": formData.platform || "",
-                                "name": formData.newsletterName || "",
-                                "website": formData.archiveLink || ""
-                            }
-                        });
-                    } else {
-                        throw new Error('ChiliPiper.submit not available');
-                    }
-                } catch (error) {
-                    console.error('Error submitting to Chilipiper:', error);
-                    // Fallback to email if Chilipiper fails
-                    window.location.href = `mailto:growth@beehiiv.com?subject=Enterprise%20Growth%20Strategy%20Session&body=Hi%20team,%0A%0AI%27d%20like%20to%20schedule%20a%20strategy%20session.%0A%0AName:%20${formData.firstName}%20${formData.lastName}%0AEmail:%20${formData.email}%0ANewsletter:%20${formData.newsletterName}%0ASubscribers:%20${formData.customSubscriberCount || formData.subscriberCount}%0APlatform:%20${formData.platform}%0A%0AThanks!`;
-                }
-            });
-        }
-    },
 
     generateTableOfContents() {
         return `
