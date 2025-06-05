@@ -373,6 +373,8 @@ const AuditGenerator = {
         }
         
         if (auditContent) {
+            let finalContent = '';
+            
             if (aiGeneratedContent) {
                 // Clean up AI-generated content before displaying
                 let cleanContent = aiGeneratedContent;
@@ -382,11 +384,17 @@ const AuditGenerator = {
                 cleanContent = cleanContent.replace(/```\s*/g, '');
                 cleanContent = cleanContent.replace(/^```.*$/gm, '');
                 
-                auditContent.innerHTML = cleanContent;
+                finalContent = cleanContent;
             } else {
                 // Fallback to basic template
-                auditContent.innerHTML = this.generateFallbackHTML(formData);
+                finalContent = this.generateFallbackHTML(formData);
             }
+            
+            // Add table of contents and then the content
+            auditContent.innerHTML = this.generateTableOfContents() + finalContent;
+            
+            // Add anchor IDs to section headers after content is loaded
+            this.addAnchorIds();
         }
     },
 
@@ -722,23 +730,248 @@ const AuditGenerator = {
     },
 
     loadChilipiperWidget(formData) {
-        // For now, show a placeholder for the Chilipiper widget
-        // In production, you would integrate with actual Chilipiper code
         const container = document.getElementById('chilipiper-container');
         if (container) {
+            // Create the Chilipiper container
             container.innerHTML = `
-                <div style="border: 2px dashed var(--color-primary); padding: var(--space-24); border-radius: var(--radius-lg); background: rgba(var(--color-primary-rgb), 0.05);">
-                    <h4 style="color: var(--color-primary); margin-bottom: var(--space-12);">📅 Schedule Your Strategy Session</h4>
+                <div id="chilipiper-booking-widget" style="min-height: 400px; padding: var(--space-16); border-radius: var(--radius-lg); background: var(--color-surface);">
+                    <div class="loading-chilipiper" style="text-align: center; padding: var(--space-32);">
+                        <div class="loading-spinner" style="margin: 0 auto var(--space-16); width: 40px; height: 40px; border: 3px solid var(--color-secondary); border-top: 3px solid var(--color-primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="color: var(--color-text-secondary);">Loading scheduling widget...</p>
+                    </div>
+                </div>
+            `;
+            
+            // Load Chilipiper script if not already loaded
+            if (!window.ChiliPiper) {
+                this.loadChilipiperScript(formData);
+            } else {
+                this.deployChilipiper(formData);
+            }
+        }
+    },
+
+    loadChilipiperScript(formData) {
+        // Check if script is already loaded
+        if (document.getElementById('chilipiper-concierge')) {
+            this.deployChilipiper(formData);
+            return;
+        }
+
+        // Create and load the Chilipiper script
+        const script = document.createElement('script');
+        script.id = 'chilipiper-concierge';
+        script.src = 'https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js';
+        script.crossOrigin = 'anonymous';
+        script.type = 'text/javascript';
+        
+        script.onload = () => {
+            this.deployChilipiper(formData);
+        };
+        
+        script.onerror = () => {
+            console.error('Failed to load Chilipiper script');
+            this.showChilipiperFallback(formData);
+        };
+        
+        document.head.appendChild(script);
+    },
+
+    deployChilipiper(formData) {
+        try {
+            // Wait a moment for ChiliPiper to be fully loaded
+            setTimeout(() => {
+                if (window.ChiliPiper && window.ChiliPiper.deploy) {
+                    // Deploy Chilipiper with user data
+                    window.ChiliPiper.deploy("beehiiv", "inbound-router", {
+                        "formType": "HTML",
+                        "leadInfo": {
+                            "firstName": formData.firstName,
+                            "lastName": formData.lastName,
+                            "email": formData.email,
+                            "subscribers": formData.customSubscriberCount || formData.subscriberCount,
+                            "platform": formData.platform,
+                            "newsletterName": formData.newsletterName,
+                            "website": formData.archiveLink,
+                            "source": "newsletter_audit_tool_enterprise"
+                        },
+                        "containerSelector": "#chilipiper-booking-widget"
+                    });
+                    
+                    // Hide loading indicator
+                    const loadingElement = document.querySelector('.loading-chilipiper');
+                    if (loadingElement) {
+                        loadingElement.style.display = 'none';
+                    }
+                } else {
+                    throw new Error('ChiliPiper not available');
+                }
+            }, 500);
+        } catch (error) {
+            console.error('Error deploying Chilipiper:', error);
+            this.showChilipiperFallback(formData);
+        }
+    },
+
+    showChilipiperFallback(formData) {
+        const container = document.getElementById('chilipiper-booking-widget');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: var(--space-24);">
+                    <h4 style="color: var(--color-primary); margin-bottom: var(--space-16);">📅 Schedule Your Strategy Session</h4>
                     <p style="margin-bottom: var(--space-16); color: var(--color-text-secondary);">
-                        Chilipiper scheduling widget would be embedded here.<br>
-                        User: ${formData.firstName} ${formData.lastName} (${formData.email})
+                        Click the button below to schedule your custom growth strategy session.
                     </p>
-                    <a href="https://calendly.com/your-booking-link" target="_blank" class="btn btn--primary">
+                    <div style="background: var(--color-secondary); padding: var(--space-16); border-radius: var(--radius-base); margin-bottom: var(--space-16);">
+                        <p style="margin: 0; font-weight: var(--font-weight-medium);">
+                            User: ${formData.firstName} ${formData.lastName}<br>
+                            Email: ${formData.email}<br>
+                            Newsletter: ${formData.newsletterName}<br>
+                            Subscribers: ${formData.customSubscriberCount || formData.subscriberCount}
+                        </p>
+                    </div>
+                    <button id="chilipiper-submit-btn" class="btn btn--primary" style="margin-bottom: var(--space-12);">
                         Schedule Strategy Session
+                    </button>
+                    <br>
+                    <a href="mailto:growth@beehiiv.com?subject=Enterprise%20Growth%20Strategy%20Session&body=Hi%20team,%0A%0AI%27d%20like%20to%20schedule%20a%20strategy%20session.%0A%0AName:%20${formData.firstName}%20${formData.lastName}%0AEmail:%20${formData.email}%0ANewsletter:%20${formData.newsletterName}%0ASubscribers:%20${formData.customSubscriberCount || formData.subscriberCount}%0APlatform:%20${formData.platform}%0A%0AThanks!" 
+                       class="btn btn--secondary" style="font-size: var(--font-size-sm);">
+                        Or Email Our Team
                     </a>
                 </div>
             `;
+            
+            // Load Chilipiper script and set up submit functionality
+            this.loadChilipiperSubmitScript(formData);
         }
+    },
+
+    loadChilipiperSubmitScript(formData) {
+        // Check if script is already loaded
+        if (document.getElementById('chilipiper-concierge')) {
+            this.setupChilipiperSubmit(formData);
+            return;
+        }
+
+        // Create and load the Chilipiper script
+        const script = document.createElement('script');
+        script.id = 'chilipiper-concierge';
+        script.src = 'https://beehiiv.chilipiper.com/concierge-js/cjs/concierge.js';
+        script.crossOrigin = 'anonymous';
+        script.type = 'text/javascript';
+        
+        script.onload = () => {
+            this.setupChilipiperSubmit(formData);
+        };
+        
+        script.onerror = () => {
+            console.error('Failed to load Chilipiper script for submit');
+            // Keep the email fallback available
+        };
+        
+        document.head.appendChild(script);
+    },
+
+    setupChilipiperSubmit(formData) {
+        const submitBtn = document.getElementById('chilipiper-submit-btn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                try {
+                    if (window.ChiliPiper && window.ChiliPiper.submit) {
+                        window.ChiliPiper.submit("beehiiv", "inbound-router", {
+                            trigger: 'ThirdPartyForm',
+                            lead: {
+                                "firstname": formData.firstName || "",
+                                "lastname": formData.lastName || "",
+                                "email": formData.email || "",
+                                "phone": "", // No phone field in our form
+                                "subscribers": formData.customSubscriberCount || formData.subscriberCount || "",
+                                "platform": formData.platform || "",
+                                "name": formData.newsletterName || "",
+                                "website": formData.archiveLink || ""
+                            }
+                        });
+                    } else {
+                        throw new Error('ChiliPiper.submit not available');
+                    }
+                } catch (error) {
+                    console.error('Error submitting to Chilipiper:', error);
+                    // Fallback to email if Chilipiper fails
+                    window.location.href = `mailto:growth@beehiiv.com?subject=Enterprise%20Growth%20Strategy%20Session&body=Hi%20team,%0A%0AI%27d%20like%20to%20schedule%20a%20strategy%20session.%0A%0AName:%20${formData.firstName}%20${formData.lastName}%0AEmail:%20${formData.email}%0ANewsletter:%20${formData.newsletterName}%0ASubscribers:%20${formData.customSubscriberCount || formData.subscriberCount}%0APlatform:%20${formData.platform}%0A%0AThanks!`;
+                }
+            });
+        }
+    },
+
+    generateTableOfContents() {
+        return `
+            <div class="audit-section table-of-contents">
+                <h2>📋 Table of Contents</h2>
+                <div class="toc-list">
+                    <ol class="toc-items">
+                        <li><a href="#newsletter-overview" class="toc-link">📊 Newsletter Overview</a></li>
+                        <li><a href="#newsletter-segment" class="toc-link">🎯 Your Newsletter Segment</a></li>
+                        <li><a href="#platform-analysis" class="toc-link">🚀 Platform Analysis</a></li>
+                        <li><a href="#monetization-analysis" class="toc-link">💰 Monetization Analysis</a></li>
+                        <li><a href="#growth-recommendations" class="toc-link">📈 Growth Recommendations</a></li>
+                        <li><a href="#tools-optimization" class="toc-link">🛠️ Tools & Optimization</a></li>
+                        <li><a href="#industry-benchmarks" class="toc-link">📊 Industry Benchmarks</a></li>
+                        <li><a href="#action-plan" class="toc-link">🎯 Action Plan</a></li>
+                    </ol>
+                </div>
+                <p class="toc-note">Click any section to jump directly to that part of your audit.</p>
+            </div>
+        `;
+    },
+
+    addAnchorIds() {
+        // Wait for content to be rendered, then add IDs to section headers
+        setTimeout(() => {
+            const auditSections = document.querySelectorAll('.audit-section h2');
+            
+            auditSections.forEach(header => {
+                const text = header.textContent.toLowerCase();
+                let anchorId = '';
+                
+                if (text.includes('newsletter overview')) {
+                    anchorId = 'newsletter-overview';
+                } else if (text.includes('newsletter segment') || text.includes('your newsletter segment')) {
+                    anchorId = 'newsletter-segment';
+                } else if (text.includes('platform analysis')) {
+                    anchorId = 'platform-analysis';
+                } else if (text.includes('monetization analysis')) {
+                    anchorId = 'monetization-analysis';
+                } else if (text.includes('growth recommendations')) {
+                    anchorId = 'growth-recommendations';
+                } else if (text.includes('tools') && text.includes('optimization')) {
+                    anchorId = 'tools-optimization';
+                } else if (text.includes('industry benchmarks')) {
+                    anchorId = 'industry-benchmarks';
+                } else if (text.includes('action plan') || text.includes('next steps')) {
+                    anchorId = 'action-plan';
+                }
+                
+                if (anchorId) {
+                    header.parentElement.id = anchorId;
+                }
+            });
+            
+            // Add smooth scrolling behavior
+            document.querySelectorAll('.toc-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }, 100);
     }
 };
 

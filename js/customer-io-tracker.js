@@ -25,6 +25,7 @@ const CustomerIOTracker = {
                 firstName: userData.firstName,
                 lastName: userData.lastName,
                 email: userData.email,
+                newsletterName: userData.newsletterName,
                 createdAt: new Date().toISOString(),
                 source: 'newsletter_audit_tool'
             });
@@ -141,6 +142,7 @@ const CustomerIOTracker = {
                 user_first_name: formData.firstName,
                 user_last_name: formData.lastName,
                 user_email: formData.email,
+                user_newsletter_name: formData.newsletterName,
                 
                 // Newsletter data
                 platform: formData.platform,

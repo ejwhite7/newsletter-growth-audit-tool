@@ -26,7 +26,8 @@ const DataCollector = {
         const stepData = {
             firstName: document.getElementById('firstName')?.value || '',
             lastName: document.getElementById('lastName')?.value || '',
-            email: document.getElementById('email')?.value || ''
+            email: document.getElementById('email')?.value || '',
+            newsletterName: document.getElementById('newsletterName')?.value || ''
         };
         
         // Update form data

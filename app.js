@@ -157,8 +157,10 @@ window.updateFollowingDisplay = (value) => {
             displayValue = `${numValue} followers`;
         } else if (numValue < 1000000) {
             displayValue = `${Math.round(numValue / 1000)}K followers`;
+        } else if (numValue < 100000000) {
+            displayValue = `${Math.round(numValue / 1000000)}M followers`;
         } else {
-            displayValue = `${Math.round(numValue / 1000000)}M+ followers`;
+            displayValue = `100M+ followers`;
         }
         
         valueDisplay.textContent = displayValue;
