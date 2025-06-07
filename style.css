@@ -1215,6 +1215,163 @@ input[type="file"].form-control:hover {
         height: 28px;
         font-size: var(--font-size-xs);
     }
+
+    /* Social Media Mobile Improvements */
+    .social-channel-item {
+        flex-direction: column;
+        gap: var(--space-8);
+        align-items: stretch;
+    }
+
+    .social-channel-item select {
+        width: 100%;
+        margin-bottom: var(--space-8);
+    }
+
+    .social-channel-item input {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .btn--remove-social {
+        align-self: flex-end;
+        margin-top: var(--space-8);
+    }
+
+    /* Audit Content Mobile Optimization */
+    .audit-container {
+        padding: 0 var(--space-8);
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .audit-section {
+        margin-bottom: var(--space-24);
+        padding-bottom: var(--space-16);
+        overflow-x: hidden;
+    }
+
+    .audit-section h2 {
+        font-size: var(--font-size-xl);
+        margin-bottom: var(--space-12);
+        word-wrap: break-word;
+    }
+
+    .audit-section h3 {
+        font-size: var(--font-size-lg);
+        margin-bottom: var(--space-8);
+        word-wrap: break-word;
+    }
+
+    .audit-section p {
+        font-size: var(--font-size-sm);
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .audit-section ul {
+        padding-left: var(--space-16);
+    }
+
+    .audit-section li {
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-4);
+        word-wrap: break-word;
+    }
+
+    /* Recommendation Cards Mobile */
+    .recommendation-card {
+        padding: var(--space-12);
+        margin-bottom: var(--space-12);
+        overflow-x: hidden;
+    }
+
+    .recommendation-card h4 {
+        font-size: var(--font-size-base);
+        word-wrap: break-word;
+    }
+
+    .recommendation-card p {
+        font-size: var(--font-size-xs);
+        word-wrap: break-word;
+    }
+
+    /* Action Plan Mobile */
+    .action-plan {
+        padding: var(--space-16);
+        margin: var(--space-16) 0;
+        overflow-x: hidden;
+    }
+
+    .action-steps li {
+        flex-direction: column;
+        text-align: left;
+        gap: var(--space-8);
+        padding: var(--space-8);
+        word-wrap: break-word;
+    }
+
+    .action-steps .step-number {
+        align-self: flex-start;
+        margin-bottom: var(--space-4);
+    }
+
+    /* CTA Section Mobile */
+    .cta-section {
+        padding: var(--space-16);
+        margin: var(--space-24) 0;
+        overflow-x: hidden;
+    }
+
+    .cta-section h3 {
+        font-size: var(--font-size-lg);
+        word-wrap: break-word;
+    }
+
+    .cta-section p {
+        font-size: var(--font-size-sm);
+        word-wrap: break-word;
+    }
+
+    /* Table of Contents Mobile */
+    .table-of-contents {
+        margin-bottom: var(--space-16);
+        overflow-x: hidden;
+    }
+
+    .toc-items {
+        padding-left: var(--space-12);
+    }
+
+    .toc-items li {
+        margin-bottom: var(--space-4);
+    }
+
+    .toc-link {
+        font-size: var(--font-size-sm);
+        padding: var(--space-4) 0;
+        word-wrap: break-word;
+    }
+
+    /* Prevent horizontal overflow */
+    * {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Ensure tables and wide content are responsive */
+    .benchmark-table {
+        font-size: var(--font-size-xs);
+        overflow-x: auto;
+        display: block;
+        white-space: nowrap;
+    }
+
+    .benchmark-table th,
+    .benchmark-table td {
+        padding: var(--space-4) var(--space-6);
+        font-size: var(--font-size-xs);
+    }
 }
 
 /* Loading State */

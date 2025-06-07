@@ -446,8 +446,8 @@ const CustomerIOTracker = {
         if (following === 0) return 'none';
         if (following < 1000) return 'micro';
         if (following < 10000) return 'small';
-        if (following < 100000) return 'medium';
-        if (following < 1000000) return 'large';
+        if (following < 50000) return 'medium';
+        if (following < 100000) return 'large';
         return 'mega';
     },
 
