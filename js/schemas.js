@@ -3,8 +3,7 @@
 
 // Check if Zod is available
 if (typeof z === 'undefined') {
-  console.error('Zod is not loaded. Please include Zod via CDN or script tag.');
-  // Fallback to basic validation if Zod is not available
+  console.warn('Zod not available, using basic validation fallbacks');
 }
 
 const ZodValidation = {

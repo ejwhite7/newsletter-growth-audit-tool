@@ -26,6 +26,11 @@ const ComponentLoader = {
 
     await Promise.all(loadPromises);
   },
+
+  // Alias for loadAllComponents to maintain compatibility
+  async loadInitialComponent() {
+    return await this.loadAllComponents();
+  }
 };
 
 // Export for use in other modules

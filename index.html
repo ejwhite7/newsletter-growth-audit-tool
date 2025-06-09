@@ -14,10 +14,8 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- External Libraries -->
-    <!-- Zod temporarily disabled - using basic validation fallbacks -->
-    <script>
-    console.log('Using basic validation fallbacks - Zod integration will be re-enabled later');
-    </script>
+    <!-- Zod for validation -->
+    <script src="https://unpkg.com/zod@3.25.56/lib/index.umd.js"></script>
     
     <!-- Customer.io Analytics -->
     <script type="text/javascript">
@@ -65,6 +63,7 @@
     </div>
 
     <!-- JavaScript Modules -->
+    <script src="js/schemas.js"></script>
     <script src="js/customer-io-tracker.js"></script>
     <script src="js/component-loader.js"></script>
     <script src="js/progress-manager.js"></script>
@@ -72,7 +71,6 @@
     <script src="js/form-validator.js"></script>
     <script src="js/step-manager.js"></script>
     <script src="js/audit-generator.js"></script>
-    <script src="js/schemas.js"></script>
     
     <!-- Main Application Logic -->
     <script src="app.js"></script>
