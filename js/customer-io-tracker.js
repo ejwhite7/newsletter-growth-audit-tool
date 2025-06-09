@@ -31,4 +31,4 @@ if (typeof module !== 'undefined' && module.exports) {
     .catch(error => {
       console.error('Failed to load Customer.io tracking modules:', error);
     });
-} 
+}
