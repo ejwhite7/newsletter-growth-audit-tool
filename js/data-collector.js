@@ -15,11 +15,6 @@ const DataCollector = {
     if (collector) {
       const stepData = collector();
 
-      // Track step completion with Customer.io
-      if (window.CustomerIOTracker && typeof window.CustomerIOTracker.trackStepCompletion === 'function') {
-        CustomerIOTracker.trackStepCompletion(stepNumber, stepData);
-      }
-
       return stepData;
     }
   },
@@ -34,11 +29,6 @@ const DataCollector = {
 
     // Update form data
     Object.assign(this.formData, stepData);
-
-    // Identify user with Customer.io on first step
-    if (window.CustomerIOTracker && typeof window.CustomerIOTracker.identifyUser === 'function') {
-      CustomerIOTracker.identifyUser(stepData);
-    }
 
     return stepData;
   },
