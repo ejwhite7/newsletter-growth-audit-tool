@@ -6,6 +6,14 @@ const CustomerIOTracker = {
   // Initialize tracking with user identification
   identifyUser(userData) {
     console.log('Identifying user:', userData);
+    console.log('Customer.io status check:', {
+      'cioAnalyticsUnavailable': window.cioAnalyticsUnavailable,
+      'cioanalytics exists': !!window.cioanalytics,
+      'cioanalyticsReady': window.cioAnalyticsReady,
+      '_cio exists': !!window._cio,
+      'navigator.doNotTrack': navigator.doNotTrack
+    });
+    
     if (window.cioAnalyticsUnavailable) {
       console.log('Customer.io unavailable, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
