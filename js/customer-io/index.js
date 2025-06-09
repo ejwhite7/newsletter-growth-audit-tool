@@ -266,42 +266,17 @@ function initializeCustomerIOTracker() {
   }
 }
 
-// Wait for Customer.io analytics to be ready
-console.log('CustomerIOTracker module loaded, checking cioanalytics...', {
-  cioanalytics: !!window.cioanalytics,
-  cioanalyticsReady: !!(window.cioanalytics && typeof window.cioanalytics.ready === 'function')
-});
+// Initialize CustomerIOTracker immediately when modules are loaded
+console.log('CustomerIOTracker module loaded, initializing immediately...');
 
+// Initialize right away - Customer.io will be available when needed
+initializeCustomerIOTracker();
+
+// Also try to initialize via Customer.io ready callback if available
 if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
-  // Customer.io is loaded, use ready callback
-  console.log('Customer.io ready, using ready callback');
-  window.cioanalytics.ready(initializeCustomerIOTracker);
-} else {
-  // Customer.io not loaded yet, wait for it
-  console.log('Customer.io not ready, waiting...');
-  let checkAttempts = 0;
-  const checkCustomerIO = setInterval(() => {
-    checkAttempts++;
-    console.log(`Check attempt ${checkAttempts}, cioanalytics available:`, !!window.cioanalytics);
-
-    if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
-      console.log('Customer.io ready after waiting, using ready callback');
-      clearInterval(checkCustomerIO);
-      window.cioanalytics.ready(initializeCustomerIOTracker);
-    } else if (checkAttempts >= 50) {
-      // After 5 seconds (50 * 100ms), give up waiting
-      console.log('Timeout waiting for Customer.io, initializing anyway');
-      clearInterval(checkCustomerIO);
-      initializeCustomerIOTracker();
-    }
-  }, 100);
-
-  // Fallback: initialize after 5 seconds regardless
-  setTimeout(() => {
-    clearInterval(checkCustomerIO);
-    if (!window.CustomerIOTracker) {
-      console.log('Fallback timeout reached, initializing CustomerIOTracker');
-      initializeCustomerIOTracker();
-    }
-  }, 5000);
+  console.log('Customer.io ready callback available, using it too');
+  window.cioanalytics.ready(() => {
+    console.log('Customer.io ready callback fired');
+    // CustomerIOTracker is already initialized, nothing to do
+  });
 }
