@@ -8,13 +8,13 @@ const CustomerIOTracker = {
   identifyUser(userData) {
     console.log('Identifying user:', userData);
     
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       console.log('Customer.io unavailable, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio)) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
       console.log('Customer.io not ready, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
@@ -26,7 +26,7 @@ const CustomerIOTracker = {
 
     try {
       // Identify user with PII using correct syntax
-      window.cio.identify(this.userId, {
+      window.cioanalytics.identify(this.userId, {
         firstName: userData.firstName,
         lastName: userData.lastName,
         email: userData.email,
@@ -53,12 +53,12 @@ const CustomerIOTracker = {
 
   // Track step completion with form data
   trackStepCompletion(stepNumber, stepData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       console.log('Customer.io tracking unavailable');
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio)) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
       console.log('Customer.io not loaded or not initialized');
       return;
     }
@@ -87,7 +87,7 @@ const CustomerIOTracker = {
 
     try {
       console.log(`Tracking ${eventName}:`, trackData);
-      window.cio.track(eventName, trackData);
+      window.cioanalytics.track(eventName, trackData);
     } catch (error) {
       console.error('Customer.io track call failed:', error);
     }
@@ -95,11 +95,11 @@ const CustomerIOTracker = {
 
   // Track audit generation start
   trackAuditGenerationStart(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
@@ -107,7 +107,7 @@ const CustomerIOTracker = {
     this.auditId = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     try {
-      window.cio.track('audit_generation_started', {
+      window.cioanalytics.track('audit_generation_started', {
         userId: this.userId,
         auditId: this.auditId,
         startedAt: new Date().toISOString(),
@@ -121,13 +121,13 @@ const CustomerIOTracker = {
 
   // Track audit completion and create group
   trackAuditCompletion(formData, auditContent) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
     if (
-      !window.cio ||
-      Array.isArray(window.cio) ||
+      !window.cioanalytics ||
+      Array.isArray(window.cioanalytics) ||
       !this.userId ||
       !this.auditId
     ) {
@@ -144,7 +144,7 @@ const CustomerIOTracker = {
         formData: this.sanitizeFormData(formData),
       };
 
-      window.cio.track('audit_generation_completed', completionData);
+      window.cioanalytics.track('audit_generation_completed', completionData);
 
       // Create slugified group ID from object name
       const groupId = this.createGroupId(formData.firstName, formData.lastName);
@@ -190,7 +190,7 @@ const CustomerIOTracker = {
         audit_generation_type: auditContent ? 'ai_generated' : 'fallback_template',
       };
 
-      window.cio.group(groupId, groupData);
+      window.cioanalytics.group(groupId, groupData);
     } catch (error) {
       console.error('Customer.io audit completion tracking failed:', error);
     }
@@ -198,13 +198,13 @@ const CustomerIOTracker = {
 
   // Track audit download
   trackAuditDownload() {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
     if (
-      !window.cio ||
-      Array.isArray(window.cio) ||
+      !window.cioanalytics ||
+      Array.isArray(window.cioanalytics) ||
       !this.userId ||
       !this.auditId
     ) {
@@ -212,7 +212,7 @@ const CustomerIOTracker = {
     }
 
     try {
-      window.cio.track('audit_downloaded', {
+      window.cioanalytics.track('audit_downloaded', {
         userId: this.userId,
         auditId: this.auditId,
         downloadedAt: new Date().toISOString(),
@@ -225,16 +225,16 @@ const CustomerIOTracker = {
 
   // Track enterprise user (100k+ subscribers)
   trackEnterpriseUser(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('enterprise_user_identified', {
+      window.cioanalytics.track('enterprise_user_identified', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         monthly_revenue: formData.customMonthlyRevenue || formData.monthlyRevenue,
@@ -251,16 +251,16 @@ const CustomerIOTracker = {
 
   // Track ChiliPiper widget interactions
   trackChilipiperWidgetLoad(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('chilipiper_widget_loaded', {
+      window.cioanalytics.track('chilipiper_widget_loaded', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -274,16 +274,16 @@ const CustomerIOTracker = {
 
   // Track ChiliPiper scheduling attempts
   trackChilipiperSchedulingAttempt(formData, method = 'widget') {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('chilipiper_scheduling_attempt', {
+      window.cioanalytics.track('chilipiper_scheduling_attempt', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -297,16 +297,16 @@ const CustomerIOTracker = {
 
   // Track ChiliPiper fallback usage
   trackChilipiperFallback(formData, reason = 'widget_failed') {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('chilipiper_fallback_shown', {
+      window.cioanalytics.track('chilipiper_fallback_shown', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -320,11 +320,11 @@ const CustomerIOTracker = {
 
   // Track social media presence analysis
   trackSocialMediaAnalysis(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
@@ -347,7 +347,7 @@ const CustomerIOTracker = {
         has_no_social: socialChannels.some(ch => ch.platform === 'none'),
       };
 
-      window.cio.track('social_media_analysis', {
+      window.cioanalytics.track('social_media_analysis', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...socialAnalysis,
@@ -359,16 +359,16 @@ const CustomerIOTracker = {
 
   // Track step timing and user behavior
   trackStepTiming(stepNumber, timeSpent, interactions = {}) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('step_timing_analysis', {
+      window.cioanalytics.track('step_timing_analysis', {
         userId: this.userId,
         step_number: stepNumber,
         time_spent_seconds: timeSpent,
@@ -383,16 +383,16 @@ const CustomerIOTracker = {
 
   // Track field-specific interactions
   trackFieldInteraction(fieldName, action, value = null, stepNumber = null) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('field_interaction', {
+      window.cioanalytics.track('field_interaction', {
         userId: this.userId,
         field_name: fieldName,
         action, // 'focus', 'blur', 'change', 'error'
@@ -407,11 +407,11 @@ const CustomerIOTracker = {
 
   // Track user engagement patterns
   trackEngagementPattern(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
@@ -435,7 +435,7 @@ const CustomerIOTracker = {
         engagement_score: this.calculateEngagementScore(formData),
       };
 
-      window.cio.track('user_engagement_pattern', {
+      window.cioanalytics.track('user_engagement_pattern', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...engagement,
@@ -447,11 +447,11 @@ const CustomerIOTracker = {
 
   // Track platform migration potential
   trackPlatformMigrationPotential(formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
@@ -469,7 +469,7 @@ const CustomerIOTracker = {
         migration_likelihood: this.calculateMigrationLikelihood(formData),
       };
 
-      window.cio.track('platform_migration_analysis', {
+      window.cioanalytics.track('platform_migration_analysis', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...migrationFactors,
@@ -576,16 +576,16 @@ const CustomerIOTracker = {
 
   // Track form abandonment
   trackFormAbandonment(currentStep, formData) {
-    if (window.cioUnavailable) {
+    if (window.cioanalyticsUnavailable) {
       return;
     }
 
-    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
+    if (!window.cioanalytics || Array.isArray(window.cioanalytics) || !this.userId) {
       return;
     }
 
     try {
-      window.cio.track('audit_form_abandoned', {
+      window.cioanalytics.track('audit_form_abandoned', {
         userId: this.userId,
         abandonedAt: new Date().toISOString(),
         currentStep,
