@@ -19,6 +19,7 @@
     
     <!-- Customer.io Analytics -->
     <script>
+    /* eslint-disable */
     (function() {
         // Check Do Not Track setting
         if (navigator.doNotTrack === "1") {
@@ -26,12 +27,55 @@
             return;
         }
         
-        // Load Customer.io Analytics script
-        !function(){var i="cioanalytics", analytics=(window[i]=window[i]||[]);if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.setAttribute('data-global-customerio-analytics-key', i);t.src="https://cdp.customer.io/v1/analytics-js/snippet/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._writeKey=key;analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.15.3";
-        analytics.load("YOUR_WRITE_KEY");
-        analytics.page();
-        }}();
+        // Customer.io Analytics Snippet v4.15.3
+        var i = "cioanalytics";
+        var analytics = (window[i] = window[i] || []);
+        
+        if (!analytics.initialize) {
+            if (analytics.invoked) {
+                window.console && console.error && console.error("Customer.io snippet included twice.");
+            } else {
+                analytics.invoked = true;
+                analytics.methods = [
+                    "trackSubmit", "trackClick", "trackLink", "trackForm", "pageview", 
+                    "identify", "reset", "group", "track", "ready", "alias", "debug", 
+                    "page", "once", "off", "on", "addSourceMiddleware", 
+                    "addIntegrationMiddleware", "setAnonymousId", "addDestinationMiddleware"
+                ];
+                
+                analytics.factory = function(method) {
+                    return function() {
+                        var args = Array.prototype.slice.call(arguments);
+                        args.unshift(method);
+                        analytics.push(args);
+                        return analytics;
+                    };
+                };
+                
+                for (var i = 0; i < analytics.methods.length; i++) {
+                    var key = analytics.methods[i];
+                    analytics[key] = analytics.factory(key);
+                }
+                
+                analytics.load = function(writeKey, options) {
+                    var script = document.createElement("script");
+                    script.type = "text/javascript";
+                    script.async = true;
+                    script.setAttribute('data-global-customerio-analytics-key', 'cioanalytics');
+                    script.src = "https://cdp.customer.io/v1/analytics-js/snippet/" + writeKey + "/analytics.min.js";
+                    var firstScript = document.getElementsByTagName("script")[0];
+                    firstScript.parentNode.insertBefore(script, firstScript);
+                    analytics._writeKey = writeKey;
+                    analytics._loadOptions = options;
+                };
+                
+                analytics.SNIPPET_VERSION = "4.15.3";
+                analytics.load("d8edc5fe00d567a32bfd");
+                analytics.page();
+            }
+        }
     })();
+    /* eslint-enable */
     </script>
 </head>
 <body>
