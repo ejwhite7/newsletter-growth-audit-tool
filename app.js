@@ -415,19 +415,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Initialize Customer.io abandonment tracking
-  // The CustomerIOTracker is now initialized via Customer.io ready callback,
-  // so we just need to wait for it to be available
-  setTimeout(() => {
-    if (window.CustomerIOTracker && typeof window.CustomerIOTracker.initializeAbandonmentTracking === 'function') {
-      try {
-        CustomerIOTracker.initializeAbandonmentTracking();
-      } catch (error) {
-        console.error('CustomerIOTracker initialization failed:', error);
-      }
-    }
-  }, 500); // Wait 500ms for Customer.io ready callback to complete
-
   // Load all static components
   if (window.ComponentLoader) {
     await ComponentLoader.loadAllComponents();

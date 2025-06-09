@@ -172,54 +172,6 @@ class CustomerIOTracker {
   trackFormAbandonment(currentStep, formData) {
     return this.stepTracker.trackFormAbandonment(currentStep, formData);
   }
-
-  /**
-   * Initialize abandonment tracking
-   */
-  initializeAbandonmentTracking() {
-    let isFormStarted = false;
-
-    // Track when user starts the form
-    document.addEventListener('DOMContentLoaded', () => {
-      isFormStarted = true;
-    });
-
-    // Track page visibility changes
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && isFormStarted && this.userId) {
-        const currentStep = window.StepManager?.currentStep || 1;
-        const formData = window.DataCollector?.getFormData() || {};
-
-        // Only track abandonment if they haven't completed the audit
-        if (currentStep < 5 && !document.getElementById('auditContent')?.innerHTML) {
-          this.trackFormAbandonment(currentStep, formData);
-        }
-      }
-    });
-
-    // Track beforeunload for abandonment
-    window.addEventListener('beforeunload', () => {
-      if (isFormStarted && this.userId) {
-        const currentStep = window.StepManager?.currentStep || 1;
-        const formData = window.DataCollector?.getFormData() || {};
-
-        if (currentStep < 5 && !document.getElementById('auditContent')?.innerHTML) {
-          this.trackFormAbandonment(currentStep, formData);
-        }
-      }
-    });
-
-    // Check periodically if Customer.io has loaded and process queue
-    const checkCustomerIO = setInterval(() => {
-      if (this.core.isAvailable()) {
-        this.core.processTrackingQueue();
-        clearInterval(checkCustomerIO);
-      }
-    }, 1000);
-
-    // Clear interval after 30 seconds to avoid infinite checking
-    setTimeout(() => clearInterval(checkCustomerIO), 30000);
-  }
 }
 
 // Initialize CustomerIOTracker when Customer.io analytics is ready
@@ -232,7 +184,6 @@ function initializeCustomerIOTracker() {
 
     // Create a minimal fallback object to prevent errors
     window.CustomerIOTracker = {
-      initializeAbandonmentTracking: () => {},
       identifyUser: () => {},
       trackStepCompletion: () => {},
       trackStepTiming: () => {},
