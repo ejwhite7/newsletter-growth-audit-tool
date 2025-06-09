@@ -36,8 +36,6 @@ const DataCollector = {
     Object.assign(this.formData, stepData);
 
     // Identify user with Customer.io on first step
-    console.log('CustomerIOTracker:', window.CustomerIOTracker);
-    console.log('identifyUser type:', typeof window.CustomerIOTracker?.identifyUser);
     if (window.CustomerIOTracker && typeof window.CustomerIOTracker.identifyUser === 'function') {
       CustomerIOTracker.identifyUser(stepData);
     }

@@ -188,12 +188,34 @@ function initializeCustomerIOTracker() {
   }
 }
 
-// Initialize CustomerIOTracker immediately when modules are loaded
-initializeCustomerIOTracker();
-
-// Also try to initialize via Customer.io ready callback if available
-if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
-  window.cioanalytics.ready(() => {
-    // CustomerIOTracker is already initialized, nothing to do
-  });
+// Initialize immediately with fallback if dependencies aren't ready
+if (window.CustomerIOCore && window.CustomerIOUtils && window.StepTracker &&
+    window.AuditTracker && window.BusinessTracker && window.ChiliPiperTracker) {
+  // All dependencies available, initialize now
+  try {
+    window.CustomerIOTracker = new CustomerIOTracker();
+  } catch (error) {
+    console.error('Failed to initialize CustomerIOTracker:', error);
+    // Create fallback
+    window.CustomerIOTracker = {
+      identifyUser: () => {},
+      trackStepCompletion: () => {},
+      trackStepTiming: () => {},
+      trackFieldInteraction: () => {},
+      trackAuditGenerationStart: () => {},
+      trackAuditCompletion: () => {},
+      trackAuditDownload: () => {},
+      trackEnterpriseUser: () => {},
+      trackSocialMediaAnalysis: () => {},
+      trackEngagementPattern: () => {},
+      trackPlatformMigrationPotential: () => {},
+      trackChilipiperWidgetLoad: () => {},
+      trackChilipiperSchedulingAttempt: () => {},
+      trackChilipiperFallback: () => {},
+      trackFormAbandonment: () => {}
+    };
+  }
+} else {
+  // Dependencies not ready, try with retry logic
+  initializeCustomerIOTracker();
 }
