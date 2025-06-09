@@ -22,16 +22,9 @@
     console.log('=== CUSTOMER.IO INLINE SCRIPT EXECUTING ===');
     /* eslint-disable */
     (function() {
-        console.log('Customer.io script starting...');
+        console.log('Customer.io script starting - FORCING LOAD...');
         
-        // Check Do Not Track setting
-        if (navigator.doNotTrack === "1") {
-            console.log('Do Not Track enabled, skipping Customer.io');
-            window.cioanalyticsUnavailable = true;
-            return;
-        }
-        
-        // Customer.io Analytics Snippet v4.15.3
+        // Customer.io Analytics Snippet v4.15.3 - ALWAYS LOAD
         var i = "cioanalytics";
         var analytics = (window[i] = window[i] || []);
         
@@ -62,7 +55,7 @@
                 }
                 
                 analytics.load = function(writeKey, options) {
-                    console.log('Loading Customer.io script from CDN...');
+                    console.log('Loading Customer.io script from CDN - FORCED...');
                     var script = document.createElement("script");
                     script.type = "text/javascript";
                     script.async = true;
@@ -70,13 +63,12 @@
                     script.src = "https://cdp.customer.io/v1/analytics-js/snippet/" + writeKey + "/analytics.min.js";
                     
                     script.onload = function() {
-                        console.log('Customer.io script loaded successfully');
+                        console.log('Customer.io script loaded successfully - FORCED');
                     };
                     
                     script.onerror = function(e) {
-                        console.error('Failed to load Customer.io script:', e);
+                        console.error('Failed to load Customer.io script - FORCED:', e);
                         console.error('Script URL:', script.src);
-                        window.cioanalyticsUnavailable = true;
                     };
                     
                     var firstScript = document.getElementsByTagName("script")[0];
@@ -86,9 +78,9 @@
                 };
                 
                 analytics.SNIPPET_VERSION = "4.15.3";
-                console.log('Calling analytics.load...');
+                console.log('Calling analytics.load - FORCED...');
                 analytics.load("d8edc5fe00d567a32bfd");
-                console.log('Calling analytics.page...');
+                console.log('Calling analytics.page - FORCED...');
                 analytics.page();
             }
         }
