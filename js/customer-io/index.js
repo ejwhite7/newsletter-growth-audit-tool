@@ -6,29 +6,6 @@
  */
 class CustomerIOTracker {
   constructor() {
-    // In browser environment, classes are loaded via script tags
-    // No need for require() - they're available on window object
-
-    // Check if dependencies are available
-    if (!window.CustomerIOCore) {
-      throw new Error('CustomerIOCore not available');
-    }
-    if (!window.CustomerIOUtils) {
-      throw new Error('CustomerIOUtils not available');
-    }
-    if (!window.StepTracker) {
-      throw new Error('StepTracker not available');
-    }
-    if (!window.AuditTracker) {
-      throw new Error('AuditTracker not available');
-    }
-    if (!window.BusinessTracker) {
-      throw new Error('BusinessTracker not available');
-    }
-    if (!window.ChiliPiperTracker) {
-      throw new Error('ChiliPiperTracker not available');
-    }
-
     // Initialize core and utils
     this.core = new window.CustomerIOCore();
     this.utils = window.CustomerIOUtils;
@@ -176,27 +153,24 @@ class CustomerIOTracker {
 
 // Initialize CustomerIOTracker when Customer.io analytics is ready
 function initializeCustomerIOTracker() {
-  try {
-    console.log('Initializing CustomerIOTracker...');
-    console.log('Available dependencies:', {
-      CustomerIOCore: !!window.CustomerIOCore,
-      CustomerIOUtils: !!window.CustomerIOUtils,
-      StepTracker: !!window.StepTracker,
-      AuditTracker: !!window.AuditTracker,
-      BusinessTracker: !!window.BusinessTracker,
-      ChiliPiperTracker: !!window.ChiliPiperTracker
-    });
+  // Wait for all dependencies to be available
+  if (!window.CustomerIOCore || !window.CustomerIOUtils || !window.StepTracker ||
+      !window.AuditTracker || !window.BusinessTracker || !window.ChiliPiperTracker) {
+    // If dependencies aren't ready, try again in 100ms
+    setTimeout(initializeCustomerIOTracker, 100);
+    return;
+  }
 
+  try {
     const customerIOTracker = new CustomerIOTracker();
     window.CustomerIOTracker = customerIOTracker;
-    console.log('CustomerIOTracker initialized successfully');
   } catch (error) {
     console.error('Failed to initialize CustomerIOTracker:', error);
 
     // Create a minimal fallback object to prevent errors
     window.CustomerIOTracker = {
-      identifyUser: () => { console.log('CustomerIOTracker fallback: identifyUser called'); },
-      trackStepCompletion: () => { console.log('CustomerIOTracker fallback: trackStepCompletion called'); },
+      identifyUser: () => {},
+      trackStepCompletion: () => {},
       trackStepTiming: () => {},
       trackFieldInteraction: () => {},
       trackAuditGenerationStart: () => {},
@@ -211,7 +185,6 @@ function initializeCustomerIOTracker() {
       trackChilipiperFallback: () => {},
       trackFormAbandonment: () => {}
     };
-    console.log('CustomerIOTracker fallback object created');
   }
 }
 
