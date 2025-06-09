@@ -59,6 +59,7 @@ module.exports = {
 
     // External libraries
     z: 'readonly', // Zod library
+    analytics: 'readonly', // Customer.io
   },
   overrides: [
     {

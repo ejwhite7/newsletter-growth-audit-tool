@@ -60,7 +60,8 @@ const StepManager = {
     this.stepInteractions.button_clicks++;
 
     if (FormValidator.validateCurrentStep()) {
-      DataCollector.collectStepData(this.currentStep);
+      const stepData = DataCollector.collectStepData(this.currentStep);
+      analytics.track(`Audit Step ${this.currentStep} Completed`, stepData);
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
         await this.loadStep(this.currentStep);
