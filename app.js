@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize component loading
   if (window.ComponentLoader) {
-    ComponentLoader.loadInitialComponent();
+    ComponentLoader.loadAllComponents();
   }
 });
 

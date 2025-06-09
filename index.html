@@ -14,7 +14,10 @@
     <link rel="stylesheet" href="style.css">
     
     <!-- External Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.min.js"></script>
+    <!-- Zod temporarily disabled - using basic validation fallbacks -->
+    <script>
+    console.log('Using basic validation fallbacks - Zod integration will be re-enabled later');
+    </script>
     
     <!-- Customer.io Analytics -->
     <script type="text/javascript">
@@ -33,9 +36,11 @@
     <div id="app">
         <!-- Header Section -->
         <div id="header-container"></div>
+        <div id="headerComponent"></div>
         
         <!-- Progress Bar -->
         <div id="progress-container"></div>
+        <div id="progressComponent"></div>
         
         <!-- Main Content Area -->
         <div class="main-container">
@@ -44,6 +49,7 @@
             
             <!-- Audit Results Container -->
             <div id="audit-container" style="display: none;"></div>
+            <div id="auditComponent" style="display: none;"></div>
         </div>
         
         <!-- Loading Overlay -->

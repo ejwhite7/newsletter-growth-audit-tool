@@ -253,12 +253,22 @@ function initializeZodValidation() {
 }
 
 // Try to initialize immediately
-if (typeof z !== 'undefined') {
-  initializeZodValidation();
-} else {
-  // Wait for Zod to load
-  document.addEventListener('DOMContentLoaded', initializeZodValidation);
+function tryInitialize() {
+  if (typeof z !== 'undefined') {
+    initializeZodValidation();
+  } else {
+    console.warn('Zod not available, using basic validation fallbacks');
+    // Still initialize with basic validation
+    ZodValidation.init();
+  }
 }
+
+// Try multiple times to initialize
+tryInitialize();
+document.addEventListener('DOMContentLoaded', tryInitialize);
+
+// Also try after a delay in case Zod loads async
+setTimeout(tryInitialize, 1000);
 
 // Make available globally
 window.ZodValidation = ZodValidation;
