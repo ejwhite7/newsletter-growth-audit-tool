@@ -845,6 +845,23 @@ const AuditGenerator = {
       existingScript.remove();
     }
 
+    // Remove previous style override if it exists
+    const existingOverride = document.getElementById('chilipiper-style-override');
+    if (existingOverride) {
+      existingOverride.remove();
+    }
+
+    // Add a style override to fix the max-width issue from the global stylesheet
+    const styleOverride = document.createElement('style');
+    styleOverride.id = 'chilipiper-style-override';
+    // This targets the iframe ChiliPiper creates to undo the aggressive max-width rule.
+    styleOverride.innerHTML = `
+      #chilipiper-booking-widget iframe {
+        max-width: none !important;
+      }
+    `;
+    document.head.appendChild(styleOverride);
+
     // Create script element
     const script = document.createElement('script');
     script.id = 'chilipiper-concierge';
