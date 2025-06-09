@@ -51,16 +51,6 @@ window.addSocialChannel = () => {
 
   socialChannelCounter++;
 
-  // Track social channel addition
-  if (window.CustomerIOTracker) {
-    window.CustomerIOTracker.trackFieldInteraction(
-      'social_channels',
-      'add_channel',
-      socialChannelCounter,
-      3 // Step 3
-    );
-  }
-
   const channelItem = document.createElement('div');
   channelItem.className = 'social-channel-item';
   channelItem.id = `social-channel-${socialChannelCounter}`;
@@ -87,16 +77,6 @@ window.addSocialChannel = () => {
   const handleInput = document.getElementById(`handle-${socialChannelCounter}`);
 
   platformSelect.addEventListener('change', function () {
-    // Track platform selection
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        'social_platform_selection',
-        'platform_selected',
-        this.value,
-        3 // Step 3
-      );
-    }
-
     if (this.value && this.value !== 'none') {
       handleInput.style.display = 'block';
       handleInput.required = true;
@@ -123,16 +103,6 @@ window.addSocialChannel = () => {
 window.removeSocialChannel = id => {
   const channelItem = document.getElementById(`social-channel-${id}`);
   if (channelItem) {
-    // Track social channel removal
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        'social_channels',
-        'remove_channel',
-        id,
-        3 // Step 3
-      );
-    }
-
     channelItem.remove();
     updateSocialFollowingVisibility();
   }
@@ -180,37 +150,14 @@ window.updateFollowingDisplay = value => {
     }
 
     valueDisplay.textContent = displayValue;
-
-    // Track social following slider interaction
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        'total_social_following',
-        'slider_change',
-        value,
-        3 // Step 3
-      );
-    }
   }
 };
 
 // PDF Download functionality
 window.downloadAudit = () => {
-  // Track download with Customer.io
-  CustomerIOTracker.trackAuditDownload();
-
   // Implement PDF download functionality
   const auditContent = document.getElementById('auditContent');
   const formData = DataCollector.getFormData();
-
-  // Track enhanced user behavior
-  if (window.CustomerIOTracker) {
-    window.CustomerIOTracker.trackFieldInteraction(
-      'audit_actions',
-      'download_pdf',
-      'pdf_download',
-      null
-    );
-  }
 
   if (!auditContent) {
     alert('No audit content to download');
@@ -387,16 +334,6 @@ function createPrintWindow(formData, auditContent) {
 
 // Restart audit functionality
 window.restartAudit = () => {
-  // Track restart action
-  if (window.CustomerIOTracker) {
-    window.CustomerIOTracker.trackFieldInteraction(
-      'audit_actions',
-      'restart_audit',
-      'restart_clicked',
-      null
-    );
-  }
-
   location.reload();
 };
 

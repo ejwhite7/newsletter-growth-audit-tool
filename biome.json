@@ -68,7 +68,6 @@
       "StepManager",
       "AuditGenerator",
       "DataCollector",
-      "CustomerIOTracker",
       "ComponentLoader",
       "ProgressManager",
       "FormValidator",

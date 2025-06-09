@@ -49,7 +49,6 @@ module.exports = {
     StepManager: 'readonly',
     AuditGenerator: 'readonly',
     DataCollector: 'readonly',
-    CustomerIOTracker: 'readonly',
     ComponentLoader: 'readonly',
     ProgressManager: 'readonly',
     FormValidator: 'readonly',

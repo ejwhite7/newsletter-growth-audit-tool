@@ -22,18 +22,6 @@ const StepManager = {
   },
 
   showStep(step) {
-    // Track timing for previous step if applicable
-    if (this.stepStartTime && this.currentStep !== step) {
-      const timeSpent = (Date.now() - this.stepStartTime) / 1000;
-      if (window.CustomerIOTracker) {
-        window.CustomerIOTracker.trackStepTiming(
-          this.currentStep,
-          timeSpent,
-          this.stepInteractions
-        );
-      }
-    }
-
     // Update current step
     this.currentStep = step;
 
@@ -114,55 +102,7 @@ const StepManager = {
         field.addEventListener('input', this.handleFieldInput.bind(this));
       });
     }, 100);
-  },
-
-  handleFieldFocus(event) {
-    this.stepInteractions.field_focuses++;
-
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        event.target.name || event.target.id || 'unnamed_field',
-        'focus',
-        event.target.value,
-        this.currentStep
-      );
-    }
-  },
-
-  handleFieldBlur(event) {
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        event.target.name || event.target.id || 'unnamed_field',
-        'blur',
-        event.target.value,
-        this.currentStep
-      );
-    }
-  },
-
-  handleFieldChange(event) {
-    this.stepInteractions.field_changes++;
-
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        event.target.name || event.target.id || 'unnamed_field',
-        'change',
-        event.target.value,
-        this.currentStep
-      );
-    }
-  },
-
-  handleFieldInput(event) {
-    if (window.CustomerIOTracker) {
-      window.CustomerIOTracker.trackFieldInteraction(
-        event.target.name || event.target.id || 'unnamed_field',
-        'input',
-        event.target.value,
-        this.currentStep
-      );
-    }
-  },
+  }
 };
 
 // Export for use in other modules

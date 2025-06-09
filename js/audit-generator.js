@@ -13,9 +13,6 @@ const AuditGenerator = {
         return;
       }
 
-      // Track audit generation start with Customer.io
-      CustomerIOTracker.trackAuditGenerationStart(formData);
-
       // Show loading
       this.showLoading();
 
@@ -23,12 +20,6 @@ const AuditGenerator = {
         // Generate audit using AI
         const auditContent = await this.generateAIAudit();
         this.hideLoading();
-
-        // Track audit completion and enhanced analytics with Customer.io
-        CustomerIOTracker.trackAuditCompletion(formData, auditContent);
-        CustomerIOTracker.trackSocialMediaAnalysis(formData);
-        CustomerIOTracker.trackEngagementPattern(formData);
-        CustomerIOTracker.trackPlatformMigrationPotential(formData);
 
         // If AI generation failed, auditContent will be null
         // displayAuditReport will handle this and show the fallback template
@@ -446,23 +437,11 @@ const AuditGenerator = {
 
   async generateFallbackAudit() {
     DataCollector.collectStepData(StepManager.currentStep);
-    const formData = DataCollector.getFormData();
-
-    // Track audit generation start with Customer.io
-    CustomerIOTracker.trackAuditGenerationStart(formData);
-
     this.showLoading();
 
     // Simulate brief processing time for fallback
     setTimeout(() => {
       this.hideLoading();
-
-      // Track audit completion and enhanced analytics with Customer.io
-      CustomerIOTracker.trackAuditCompletion(formData, null);
-      CustomerIOTracker.trackSocialMediaAnalysis(formData);
-      CustomerIOTracker.trackEngagementPattern(formData);
-      CustomerIOTracker.trackPlatformMigrationPotential(formData);
-
       this.displayAuditReport();
     }, 1000);
   },
@@ -771,9 +750,6 @@ const AuditGenerator = {
     if (progressContainer) {
       progressContainer.style.display = 'none';
     }
-
-    // Track enterprise user with Customer.io
-    CustomerIOTracker.trackEnterpriseUser(formData);
   },
 
   loadChilipiperWidget(formData) {
@@ -829,9 +805,6 @@ const AuditGenerator = {
                 </div>
             `;
 
-      // Track ChiliPiper widget load
-      CustomerIOTracker.trackChilipiperWidgetLoad(formData);
-
       // Load and execute the Chilipiper script properly
       this.loadAndExecuteChilipiperScript(formData);
     }
@@ -873,7 +846,6 @@ const AuditGenerator = {
           }
         } catch (error) {
           console.error('Error deploying ChiliPiper:', error);
-          CustomerIOTracker.trackChilipiperFallback(formData, 'deployment_error');
           this.showChilipiperFallback(formData);
         }
       }, 1000); // Wait 1 second for ChiliPiper to fully initialize
@@ -881,7 +853,6 @@ const AuditGenerator = {
 
     script.onerror = error => {
       console.error('Failed to load ChiliPiper script:', error);
-      CustomerIOTracker.trackChilipiperFallback(formData, 'script_load_error');
       this.showChilipiperFallback(formData);
     };
 
@@ -926,9 +897,6 @@ const AuditGenerator = {
     const submitBtn = document.getElementById('chilipiper-submit-btn');
     if (submitBtn) {
       submitBtn.addEventListener('click', () => {
-        // Track scheduling attempt
-        CustomerIOTracker.trackChilipiperSchedulingAttempt(formData, 'fallback_button');
-
         try {
           if (window.ChiliPiper?.submit) {
             window.ChiliPiper.submit('beehiiv', 'inbound-router', {
