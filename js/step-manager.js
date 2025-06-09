@@ -73,6 +73,16 @@ const StepManager = {
         });
       }
 
+      // After step 2, update user with platform choice
+      if (this.currentStep === 2) {
+        const formData = DataCollector.getFormData();
+        if (formData.email && stepData.platform) {
+          cioanalytics.identify(formData.email, {
+            platform: stepData.platform,
+          });
+        }
+      }
+
       cioanalytics.track(`Audit Step ${this.currentStep} Completed`, stepData, { timestamp: now });
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
