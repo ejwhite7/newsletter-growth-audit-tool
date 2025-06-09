@@ -225,23 +225,10 @@ class CustomerIOTracker {
 // Initialize CustomerIOTracker when Customer.io analytics is ready
 function initializeCustomerIOTracker() {
   try {
-    console.log('Attempting to initialize CustomerIOTracker...');
-    console.log('Available dependencies:', {
-      CustomerIOCore: !!window.CustomerIOCore,
-      CustomerIOUtils: !!window.CustomerIOUtils,
-      StepTracker: !!window.StepTracker,
-      AuditTracker: !!window.AuditTracker,
-      BusinessTracker: !!window.BusinessTracker,
-      ChiliPiperTracker: !!window.ChiliPiperTracker
-    });
-
     const customerIOTracker = new CustomerIOTracker();
     window.CustomerIOTracker = customerIOTracker;
-    console.log('CustomerIOTracker initialized successfully');
   } catch (error) {
     console.error('Failed to initialize CustomerIOTracker:', error);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
 
     // Create a minimal fallback object to prevent errors
     window.CustomerIOTracker = {
@@ -262,21 +249,15 @@ function initializeCustomerIOTracker() {
       trackChilipiperFallback: () => {},
       trackFormAbandonment: () => {}
     };
-    console.log('Created fallback CustomerIOTracker object');
   }
 }
 
 // Initialize CustomerIOTracker immediately when modules are loaded
-console.log('CustomerIOTracker module loaded, initializing immediately...');
-
-// Initialize right away - Customer.io will be available when needed
 initializeCustomerIOTracker();
 
 // Also try to initialize via Customer.io ready callback if available
 if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
-  console.log('Customer.io ready callback available, using it too');
   window.cioanalytics.ready(() => {
-    console.log('Customer.io ready callback fired');
     // CustomerIOTracker is already initialized, nothing to do
   });
 }

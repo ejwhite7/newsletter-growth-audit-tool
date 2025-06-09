@@ -19,12 +19,9 @@
     
     <!-- Customer.io Analytics -->
     <script>
-    console.log('=== CUSTOMER.IO INLINE SCRIPT EXECUTING ===');
     /* eslint-disable */
     (function() {
-        console.log('Customer.io script starting - FORCING LOAD...');
-        
-        // Customer.io Analytics Snippet v4.15.3 - ALWAYS LOAD
+        // Customer.io Analytics Snippet v4.15.3
         var i = "cioanalytics";
         var analytics = (window[i] = window[i] || []);
         
@@ -55,22 +52,11 @@
                 }
                 
                 analytics.load = function(writeKey, options) {
-                    console.log('Loading Customer.io script from CDN - FORCED...');
                     var script = document.createElement("script");
                     script.type = "text/javascript";
                     script.async = true;
                     script.setAttribute('data-global-customerio-analytics-key', 'cioanalytics');
                     script.src = "https://cdp.customer.io/v1/analytics-js/snippet/" + writeKey + "/analytics.min.js";
-                    
-                    script.onload = function() {
-                        console.log('Customer.io script loaded successfully - FORCED');
-                    };
-                    
-                    script.onerror = function(e) {
-                        console.error('Failed to load Customer.io script - FORCED:', e);
-                        console.error('Script URL:', script.src);
-                    };
-                    
                     var firstScript = document.getElementsByTagName("script")[0];
                     firstScript.parentNode.insertBefore(script, firstScript);
                     analytics._writeKey = writeKey;
@@ -78,9 +64,7 @@
                 };
                 
                 analytics.SNIPPET_VERSION = "4.15.3";
-                console.log('Calling analytics.load - FORCED...');
                 analytics.load("d8edc5fe00d567a32bfd");
-                console.log('Calling analytics.page - FORCED...');
                 analytics.page();
             }
         }
