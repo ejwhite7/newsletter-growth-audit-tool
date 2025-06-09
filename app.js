@@ -415,10 +415,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Initialize Customer.io abandonment tracking
-  if (window.CustomerIOTracker && typeof window.CustomerIOTracker.initializeAbandonmentTracking === 'function') {
-    CustomerIOTracker.initializeAbandonmentTracking();
-  }
+  // Initialize Customer.io abandonment tracking with retry logic
+  const initializeTracking = () => {
+    if (window.CustomerIOTracker && typeof window.CustomerIOTracker.initializeAbandonmentTracking === 'function') {
+      try {
+        CustomerIOTracker.initializeAbandonmentTracking();
+      } catch (error) {
+        console.error('CustomerIOTracker initialization failed:', error);
+      }
+    } else {
+      // Retry after a short delay if modules aren't ready
+      setTimeout(() => {
+        if (window.CustomerIOTracker && typeof window.CustomerIOTracker.initializeAbandonmentTracking === 'function') {
+          try {
+            CustomerIOTracker.initializeAbandonmentTracking();
+          } catch (error) {
+            console.error('CustomerIOTracker initialization failed on retry:', error);
+          }
+        }
+      }, 100);
+    }
+  };
+
+  initializeTracking();
 
   // Load all static components
   if (window.ComponentLoader) {
