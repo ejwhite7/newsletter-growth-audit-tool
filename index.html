@@ -20,56 +20,13 @@
     <!-- Customer.io Analytics -->
     <script type="text/javascript">
     (function() {
-        // Check Do Not Track setting - more robust detection
-        var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
-        var dntEnabled = (dnt === "1" || dnt === "yes");
-        
-        console.log('Do Not Track check:', {
-            'navigator.doNotTrack': navigator.doNotTrack,
-            'window.doNotTrack': window.doNotTrack,
-            'navigator.msDoNotTrack': navigator.msDoNotTrack,
-            'dntEnabled': dntEnabled
-        });
-        
-        if (!dntEnabled) {
-            console.log('Customer.io: Initializing analytics...');
-            
-            // Initialize Customer.io tracking
-            (function(c,i,o){c[i]=c[i]||function(){(c[i].q=c[i].q||[]).push(arguments)};c[i].l=+new Date;
-            var a=o.createElement('script');a.async=1;a.src='https://assets.customer.io/assets/track.js';
-            var m=o.getElementsByTagName('script')[0];m.parentNode.insertBefore(a,m);
-            })(window,'cioanalytics',document);
-            
-            // Set up the analytics object
-            window.cioanalytics = window.cioanalytics || function() {
-                (window.cioanalytics.q = window.cioanalytics.q || []).push(arguments);
-            };
-            window.cioanalytics.l = +new Date;
-            
-            // Initialize tracking with site ID (replace with your actual site ID)
-            window.cioanalytics('config', {
-                site_id: '3b509b62c9e5cd9d5f13' // You'll need to replace this with your actual site ID
-            });
-            
-            // Wait for script to load and mark as ready
-            var checkReady = function() {
-                if (window._cio && window._cio.track) {
-                    console.log('Customer.io script fully loaded and ready');
-                    window.cioAnalyticsReady = true;
-                } else {
-                    console.log('Customer.io script still loading, checking again in 500ms...');
-                    setTimeout(checkReady, 500);
-                }
-            };
-            
-            // Start checking after a short delay
-            setTimeout(checkReady, 1000);
-            
-            console.log('Customer.io analytics initialized successfully');
+        var cio = window.cio = window.cio || [];
+        if (navigator.doNotTrack != "1") {
+            (function(b,o,n,g,s,r,c){if(b[s])return;b[s]={};b[s].q=[];c=o.createElement(n);
+            c.async=1;c.src=g;r=o.getElementsByTagName(n)[0];r.parentNode.insertBefore(c,r);
+            })(window,document,"script","https://assets.customer.io/assets/track.js","cio");
         } else {
-            // Set flag if tracking is disabled
-            console.log('Customer.io: Tracking disabled due to Do Not Track setting');
-            window.cioAnalyticsUnavailable = true;
+            window.cioUnavailable = true;
         }
     })();
     </script>

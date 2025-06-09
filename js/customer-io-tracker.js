@@ -3,33 +3,30 @@ const CustomerIOTracker = {
   // Generate a unique audit ID for grouping
   auditId: null,
   userId: null,
+
   // Initialize tracking with user identification
   identifyUser(userData) {
     console.log('Identifying user:', userData);
-    console.log('Customer.io status check:', {
-      'cioAnalyticsUnavailable': window.cioAnalyticsUnavailable,
-      'cioanalytics exists': !!window.cioanalytics,
-      'cioanalyticsReady': window.cioAnalyticsReady,
-      '_cio exists': !!window._cio,
-      'navigator.doNotTrack': navigator.doNotTrack
-    });
     
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       console.log('Customer.io unavailable, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
-    if (!window.cioanalytics) {
-      console.log('Customer.io not loaded, setting userId internally only');
+
+    if (!window.cio || Array.isArray(window.cio)) {
+      console.log('Customer.io not ready, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
+
     // Set userId as the user's email
     this.userId = userData.email;
     console.log('Setting userId:', this.userId);
+
     try {
       // Identify user with PII using correct syntax
-      window.cioanalytics('identify', this.userId, {
+      window.cio.identify(this.userId, {
         firstName: userData.firstName,
         lastName: userData.lastName,
         email: userData.email,
@@ -42,6 +39,7 @@ const CustomerIOTracker = {
       console.error('Customer.io identify call failed:', error);
     }
   },
+
   // Create slugified group ID from object name
   createGroupId(firstName, lastName) {
     const objectName = `Newsletter Audit ${firstName} ${lastName}`;
@@ -52,20 +50,24 @@ const CustomerIOTracker = {
       .replace(/-+/g, '-') // Replace multiple hyphens with single
       .trim();
   },
+
   // Track step completion with form data
   trackStepCompletion(stepNumber, stepData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       console.log('Customer.io tracking unavailable');
       return;
     }
-    if (!window.cioanalytics) {
+
+    if (!window.cio || Array.isArray(window.cio)) {
       console.log('Customer.io not loaded or not initialized');
       return;
     }
+
     if (!this.userId) {
       console.log('No userId set for tracking');
       return;
     }
+
     const eventName = `audit_step_${stepNumber}_completed`;
     const stepNames = {
       1: 'basic_info',
@@ -74,6 +76,7 @@ const CustomerIOTracker = {
       4: 'revenue_monetization',
       5: 'tools_upload',
     };
+
     const trackData = {
       userId: this.userId,
       stepNumber,
@@ -81,25 +84,30 @@ const CustomerIOTracker = {
       completedAt: new Date().toISOString(),
       ...stepData,
     };
+
     try {
       console.log(`Tracking ${eventName}:`, trackData);
-      window.cioanalytics('track', eventName, trackData);
+      window.cio.track(eventName, trackData);
     } catch (error) {
       console.error('Customer.io track call failed:', error);
     }
   },
+
   // Track audit generation start
   trackAuditGenerationStart(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     // Generate unique audit ID
     this.auditId = `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     try {
-      window.cioanalytics('track', 'audit_generation_started', {
+      window.cio.track('audit_generation_started', {
         userId: this.userId,
         auditId: this.auditId,
         startedAt: new Date().toISOString(),
@@ -110,18 +118,22 @@ const CustomerIOTracker = {
       console.error('Customer.io audit generation start tracking failed:', error);
     }
   },
+
   // Track audit completion and create group
   trackAuditCompletion(formData, auditContent) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
+
     if (
-      !window.cioanalytics ||
+      !window.cio ||
+      Array.isArray(window.cio) ||
       !this.userId ||
       !this.auditId
     ) {
       return;
     }
+
     try {
       // Track completion event
       const completionData = {
@@ -131,9 +143,12 @@ const CustomerIOTracker = {
         success: true,
         formData: this.sanitizeFormData(formData),
       };
-      window.cioanalytics('track', 'audit_generation_completed', completionData);
+
+      window.cio.track('audit_generation_completed', completionData);
+
       // Create slugified group ID from object name
       const groupId = this.createGroupId(formData.firstName, formData.lastName);
+
       // Create group for the audit with all data using correct syntax
       const groupData = {
         name: `Newsletter Audit - ${formData.firstName} ${formData.lastName}`,
@@ -141,11 +156,13 @@ const CustomerIOTracker = {
         created_at: new Date().toISOString(),
         user_id: this.userId,
         group_type: '134178211',
+
         // User information
         user_first_name: formData.firstName,
         user_last_name: formData.lastName,
         user_email: formData.email,
         user_newsletter_name: formData.newsletterName,
+
         // Newsletter data
         platform: formData.platform,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
@@ -155,39 +172,47 @@ const CustomerIOTracker = {
         monetization_methods: Array.isArray(formData.monetizationMethods)
           ? formData.monetizationMethods.join(', ')
           : '',
+
         // Social presence
         twitter_handle: formData.twitterHandle,
         linkedin_handle: formData.linkedinHandle,
         instagram_handle: formData.instagramHandle,
         tiktok_handle: formData.tiktokHandle,
+
         // Other data
         team_size: formData.teamSize,
         additional_tools: formData.additionalTools,
         archive_link: formData.archiveLink,
+
         // Audit metadata
         audit_generated_at: new Date().toISOString(),
         audit_content_length: auditContent ? auditContent.length : 0,
         audit_generation_type: auditContent ? 'ai_generated' : 'fallback_template',
       };
-      window.cioanalytics('group', groupId, groupData);
+
+      window.cio.group(groupId, groupData);
     } catch (error) {
       console.error('Customer.io audit completion tracking failed:', error);
     }
   },
+
   // Track audit download
   trackAuditDownload() {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
+
     if (
-      !window.cioanalytics ||
+      !window.cio ||
+      Array.isArray(window.cio) ||
       !this.userId ||
       !this.auditId
     ) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'audit_downloaded', {
+      window.cio.track('audit_downloaded', {
         userId: this.userId,
         auditId: this.auditId,
         downloadedAt: new Date().toISOString(),
@@ -197,16 +222,19 @@ const CustomerIOTracker = {
       console.error('Customer.io audit download tracking failed:', error);
     }
   },
+
   // Track enterprise user (100k+ subscribers)
   trackEnterpriseUser(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'enterprise_user_identified', {
+      window.cio.track('enterprise_user_identified', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         monthly_revenue: formData.customMonthlyRevenue || formData.monthlyRevenue,
@@ -220,16 +248,19 @@ const CustomerIOTracker = {
       console.error('Customer.io enterprise user tracking failed:', error);
     }
   },
+
   // Track ChiliPiper widget interactions
   trackChilipiperWidgetLoad(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'chilipiper_widget_loaded', {
+      window.cio.track('chilipiper_widget_loaded', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -240,16 +271,19 @@ const CustomerIOTracker = {
       console.error('Customer.io ChiliPiper widget load tracking failed:', error);
     }
   },
+
   // Track ChiliPiper scheduling attempts
   trackChilipiperSchedulingAttempt(formData, method = 'widget') {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'chilipiper_scheduling_attempt', {
+      window.cio.track('chilipiper_scheduling_attempt', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -260,16 +294,19 @@ const CustomerIOTracker = {
       console.error('Customer.io ChiliPiper scheduling attempt tracking failed:', error);
     }
   },
+
   // Track ChiliPiper fallback usage
   trackChilipiperFallback(formData, reason = 'widget_failed') {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'chilipiper_fallback_shown', {
+      window.cio.track('chilipiper_fallback_shown', {
         userId: this.userId,
         subscriber_count: formData.customSubscriberCount || formData.subscriberCount,
         platform: formData.platform,
@@ -280,17 +317,21 @@ const CustomerIOTracker = {
       console.error('Customer.io ChiliPiper fallback tracking failed:', error);
     }
   },
+
   // Track social media presence analysis
   trackSocialMediaAnalysis(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
       const socialChannels = formData.socialChannels || [];
       const totalFollowing = Number.parseInt(formData.totalSocialFollowing) || 0;
+
       // Analyze social presence
       const socialAnalysis = {
         total_platforms: socialChannels.length,
@@ -305,7 +346,8 @@ const CustomerIOTracker = {
         following_tier: this.categorizeSocialFollowing(totalFollowing),
         has_no_social: socialChannels.some(ch => ch.platform === 'none'),
       };
-      window.cioanalytics('track', 'social_media_analysis', {
+
+      window.cio.track('social_media_analysis', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...socialAnalysis,
@@ -314,16 +356,19 @@ const CustomerIOTracker = {
       console.error('Customer.io social media analysis tracking failed:', error);
     }
   },
+
   // Track step timing and user behavior
   trackStepTiming(stepNumber, timeSpent, interactions = {}) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'step_timing_analysis', {
+      window.cio.track('step_timing_analysis', {
         userId: this.userId,
         step_number: stepNumber,
         time_spent_seconds: timeSpent,
@@ -335,16 +380,19 @@ const CustomerIOTracker = {
       console.error('Customer.io step timing tracking failed:', error);
     }
   },
+
   // Track field-specific interactions
   trackFieldInteraction(fieldName, action, value = null, stepNumber = null) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'field_interaction', {
+      window.cio.track('field_interaction', {
         userId: this.userId,
         field_name: fieldName,
         action, // 'focus', 'blur', 'change', 'error'
@@ -356,14 +404,17 @@ const CustomerIOTracker = {
       console.error('Customer.io field interaction tracking failed:', error);
     }
   },
+
   // Track user engagement patterns
   trackEngagementPattern(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
       const engagement = {
         has_open_rate: !!(formData.openRate && formData.openRate !== 'Unknown'),
@@ -383,7 +434,8 @@ const CustomerIOTracker = {
         uses_tools: !!(formData.additionalTools && formData.additionalTools.trim() !== ''),
         engagement_score: this.calculateEngagementScore(formData),
       };
-      window.cioanalytics('track', 'user_engagement_pattern', {
+
+      window.cio.track('user_engagement_pattern', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...engagement,
@@ -392,14 +444,17 @@ const CustomerIOTracker = {
       console.error('Customer.io engagement pattern tracking failed:', error);
     }
   },
+
   // Track platform migration potential
   trackPlatformMigrationPotential(formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
       const migrationFactors = {
         current_platform: formData.platform,
@@ -413,7 +468,8 @@ const CustomerIOTracker = {
         ),
         migration_likelihood: this.calculateMigrationLikelihood(formData),
       };
-      window.cioanalytics('track', 'platform_migration_analysis', {
+
+      window.cio.track('platform_migration_analysis', {
         userId: this.userId,
         timestamp: new Date().toISOString(),
         ...migrationFactors,
@@ -422,6 +478,7 @@ const CustomerIOTracker = {
       console.error('Customer.io platform migration tracking failed:', error);
     }
   },
+
   // Helper functions for categorization
   categorizeSocialFollowing(following) {
     if (following === 0) return 'none';
@@ -431,6 +488,7 @@ const CustomerIOTracker = {
     if (following < 100000) return 'large';
     return 'mega';
   },
+
   categorizeTimeSpent(seconds) {
     if (seconds < 30) return 'very_fast';
     if (seconds < 60) return 'fast';
@@ -438,16 +496,20 @@ const CustomerIOTracker = {
     if (seconds < 300) return 'slow';
     return 'very_slow';
   },
+
   determineSubscriberTier(subscriberCount) {
     if (!subscriberCount) return 'unknown';
+
     const count = Number.parseInt(subscriberCount) || 0;
     if (count < 1000) return 'starter';
     if (count < 10000) return 'growing';
     if (count < 100000) return 'established';
     return 'enterprise';
   },
+
   determineRevenueTier(revenue) {
     if (!revenue) return 'none';
+
     const amount = Number.parseInt(revenue) || 0;
     if (amount === 0) return 'none';
     if (amount < 1000) return 'low';
@@ -455,57 +517,75 @@ const CustomerIOTracker = {
     if (amount < 10000) return 'high';
     return 'very_high';
   },
+
   calculateEngagementScore(formData) {
     let score = 0;
+
     // Basic info completeness (20 points)
     if (formData.firstName && formData.lastName && formData.email) score += 20;
+
     // Newsletter metrics (30 points)
     if (formData.openRate && formData.openRate !== 'Unknown') score += 15;
     if (formData.clickRate && formData.clickRate !== 'Unknown') score += 15;
+
     // Social presence (20 points)
     if (formData.socialChannels && formData.socialChannels.length > 0) score += 20;
+
     // Monetization (15 points)
     if (formData.monetizationMethods && formData.monetizationMethods.length > 0) score += 15;
+
     // Additional details (15 points)
     if (formData.archiveLink) score += 5;
     if (formData.additionalTools) score += 5;
     if (formData.teamSize && formData.teamSize !== 'Just me') score += 5;
+
     return score;
   },
+
   calculateMigrationLikelihood(formData) {
     if (formData.platform === 'beehiiv') return 'already_on_beehiiv';
+
     let likelihood = 0;
+
     // Higher subscriber count = more likely to migrate
     const subscriberCount =
       Number.parseInt(formData.customSubscriberCount || formData.subscriberCount) || 0;
     if (subscriberCount > 10000) likelihood += 30;
     else if (subscriberCount > 1000) likelihood += 20;
     else likelihood += 10;
+
     // Revenue indicates serious business
     const revenue = Number.parseInt(formData.customMonthlyRevenue || formData.monthlyRevenue) || 0;
     if (revenue > 1000) likelihood += 25;
     else if (revenue > 0) likelihood += 15;
+
     // Social presence indicates growth focus
     if (formData.socialChannels && formData.socialChannels.length > 2) likelihood += 20;
+
     // Team size indicates scaling
     if (formData.teamSize && formData.teamSize !== 'Just me') likelihood += 15;
+
     // Platform limitations
     if (['Mailchimp', 'Constant Contact'].includes(formData.platform)) likelihood += 10;
+
     if (likelihood >= 70) return 'high';
     if (likelihood >= 50) return 'medium';
     if (likelihood >= 30) return 'low';
     return 'very_low';
   },
+
   // Track form abandonment
   trackFormAbandonment(currentStep, formData) {
-    if (window.cioAnalyticsUnavailable) {
+    if (window.cioUnavailable) {
       return;
     }
-    if (!window.cioanalytics || !this.userId) {
+
+    if (!window.cio || Array.isArray(window.cio) || !this.userId) {
       return;
     }
+
     try {
-      window.cioanalytics('track', 'audit_form_abandoned', {
+      window.cio.track('audit_form_abandoned', {
         userId: this.userId,
         abandonedAt: new Date().toISOString(),
         currentStep,
@@ -517,36 +597,45 @@ const CustomerIOTracker = {
       console.error('Customer.io form abandonment tracking failed:', error);
     }
   },
+
   // Sanitize form data for tracking (remove sensitive info if needed)
   sanitizeFormData(formData) {
     const sanitized = { ...formData };
+
     // Remove file uploads and other sensitive data
     sanitized.newsletterUpload = undefined;
+
     return sanitized;
   },
+
   // Track page visibility changes for abandonment detection
   initializeAbandonmentTracking() {
     let isFormStarted = false;
+
     // Track when user starts the form
     document.addEventListener('DOMContentLoaded', () => {
       isFormStarted = true;
     });
+
     // Track page visibility changes
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && isFormStarted && this.userId) {
         const currentStep = StepManager.currentStep;
         const formData = DataCollector.getFormData();
+
         // Only track abandonment if they haven't completed the audit
         if (currentStep < 5 && !document.getElementById('auditContent')?.innerHTML) {
           this.trackFormAbandonment(currentStep, formData);
         }
       }
     });
+
     // Track beforeunload for abandonment
     window.addEventListener('beforeunload', () => {
       if (isFormStarted && this.userId) {
         const currentStep = StepManager.currentStep;
         const formData = DataCollector.getFormData();
+
         if (currentStep < 5 && !document.getElementById('auditContent')?.innerHTML) {
           this.trackFormAbandonment(currentStep, formData);
         }
@@ -554,6 +643,7 @@ const CustomerIOTracker = {
     });
   },
 };
+
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CustomerIOTracker;
