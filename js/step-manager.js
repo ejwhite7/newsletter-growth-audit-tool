@@ -61,6 +61,15 @@ const StepManager = {
 
     if (FormValidator.validateCurrentStep()) {
       const stepData = DataCollector.collectStepData(this.currentStep);
+
+      // Identify user to Customer.io on the first step
+      if (this.currentStep === 1 && stepData.email) {
+        cioanalytics.identify(stepData.email, {
+          firstName: stepData.firstName,
+          lastName: stepData.lastName
+        });
+      }
+
       cioanalytics.track(`Audit Step ${this.currentStep} Completed`, stepData);
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
