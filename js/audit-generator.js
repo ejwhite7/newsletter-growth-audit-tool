@@ -743,7 +743,7 @@ const AuditGenerator = {
 
     if (formContainer) {
       formContainer.innerHTML = `
-                <div class="card">
+                <div class="card chilipiper-card">
                     <div class="card__body" style="text-align: center; padding: var(--space-32);">
                         <h2>🚀 Premium Growth Strategy Session</h2>
                         <p style="font-size: var(--font-size-lg); color: var(--color-text-secondary); margin-bottom: var(--space-24);">
