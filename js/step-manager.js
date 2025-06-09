@@ -103,7 +103,23 @@ const StepManager = {
         field.addEventListener('input', this.handleFieldInput.bind(this));
       });
     }, 100);
-  }
+  },
+
+  handleFieldFocus() {
+    this.stepInteractions.field_focuses++;
+  },
+
+  handleFieldBlur() {
+    // Can add logic for when a field loses focus
+  },
+
+  handleFieldChange() {
+    this.stepInteractions.field_changes++;
+  },
+
+  handleFieldInput() {
+    // Can add logic for real-time input handling
+  },
 };
 
 // Export for use in other modules
