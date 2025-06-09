@@ -2,10 +2,16 @@
 const FormValidator = {
   validateCurrentStep() {
     const currentStepEl = document.querySelector('.form-step.active');
-    if (!currentStepEl) return true;
+    if (!currentStepEl) {
+      console.log('FormValidator: No active step found');
+      return true;
+    }
 
     const requiredFields = currentStepEl.querySelectorAll('[required]');
     let isValid = true;
+    const emptyFields = [];
+
+    console.log(`FormValidator: Validating ${requiredFields.length} required fields`);
 
     // Clear previous error states
     document.querySelectorAll('.error-message').forEach(el => el.remove());
@@ -14,12 +20,16 @@ const FormValidator = {
     requiredFields.forEach(field => {
       if (!field.value.trim()) {
         field.classList.add('error');
+        emptyFields.push(field.id || field.name || 'unnamed field');
         isValid = false;
       }
     });
 
     if (!isValid) {
+      console.log('FormValidator: Validation failed for fields:', emptyFields);
       this.showErrorMessage(currentStepEl, 'Please fill in all required fields.');
+    } else {
+      console.log('FormValidator: Validation passed');
     }
 
     return isValid;
