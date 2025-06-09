@@ -16,7 +16,13 @@ const DataCollector = {
       const stepData = collector();
 
       // Track step completion with Customer.io
-      CustomerIOTracker.trackStepCompletion(stepNumber, stepData);
+      try {
+        if (window.CustomerIOTracker && typeof window.CustomerIOTracker.trackStepCompletion === 'function') {
+          CustomerIOTracker.trackStepCompletion(stepNumber, stepData);
+        }
+      } catch (error) {
+        console.error('Error calling CustomerIOTracker.trackStepCompletion:', error);
+      }
 
       return stepData;
     }
@@ -34,7 +40,15 @@ const DataCollector = {
     Object.assign(this.formData, stepData);
 
     // Identify user with Customer.io on first step
-    CustomerIOTracker.identifyUser(stepData);
+    try {
+      if (window.CustomerIOTracker && typeof window.CustomerIOTracker.identifyUser === 'function') {
+        CustomerIOTracker.identifyUser(stepData);
+      } else {
+        console.warn('CustomerIOTracker.identifyUser not available:', typeof window.CustomerIOTracker);
+      }
+    } catch (error) {
+      console.error('Error calling CustomerIOTracker.identifyUser:', error);
+    }
 
     return stepData;
   },

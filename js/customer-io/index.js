@@ -177,15 +177,26 @@ class CustomerIOTracker {
 // Initialize CustomerIOTracker when Customer.io analytics is ready
 function initializeCustomerIOTracker() {
   try {
+    console.log('Initializing CustomerIOTracker...');
+    console.log('Available dependencies:', {
+      CustomerIOCore: !!window.CustomerIOCore,
+      CustomerIOUtils: !!window.CustomerIOUtils,
+      StepTracker: !!window.StepTracker,
+      AuditTracker: !!window.AuditTracker,
+      BusinessTracker: !!window.BusinessTracker,
+      ChiliPiperTracker: !!window.ChiliPiperTracker
+    });
+
     const customerIOTracker = new CustomerIOTracker();
     window.CustomerIOTracker = customerIOTracker;
+    console.log('CustomerIOTracker initialized successfully');
   } catch (error) {
     console.error('Failed to initialize CustomerIOTracker:', error);
 
     // Create a minimal fallback object to prevent errors
     window.CustomerIOTracker = {
-      identifyUser: () => {},
-      trackStepCompletion: () => {},
+      identifyUser: () => { console.log('CustomerIOTracker fallback: identifyUser called'); },
+      trackStepCompletion: () => { console.log('CustomerIOTracker fallback: trackStepCompletion called'); },
       trackStepTiming: () => {},
       trackFieldInteraction: () => {},
       trackAuditGenerationStart: () => {},
@@ -200,6 +211,7 @@ function initializeCustomerIOTracker() {
       trackChilipiperFallback: () => {},
       trackFormAbandonment: () => {}
     };
+    console.log('CustomerIOTracker fallback object created');
   }
 }
 
