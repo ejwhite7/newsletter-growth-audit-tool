@@ -614,7 +614,7 @@ select.form-control {
 .header {
     text-align: center;
     margin-bottom: var(--space-16);
-    padding: var(--space-32) 0 0 0;
+    padding: 0;
 }
 
 .header h1 {
@@ -690,10 +690,54 @@ select.form-control {
     margin: 0;
 }
 
-/* Form Container */
-.form-container {
-    max-width: 600px;
+/* Main Container */
+.main-container {
+    width: 100%;
     margin: 0 auto;
+    padding: 0 var(--space-16);
+}
+
+/* Form Container - Responsive sizing */
+.form-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Desktop: Proportional width based on screen size */
+@media (min-width: 769px) {
+    .main-container {
+        max-width: 90vw;
+        padding: 0 var(--space-24);
+    }
+    
+    .form-container {
+        max-width: min(800px, 60vw);
+    }
+}
+
+/* Large desktop: Cap the maximum width */
+@media (min-width: 1200px) {
+    .main-container {
+        max-width: 1200px;
+        padding: 0 var(--space-32);
+    }
+    
+    .form-container {
+        max-width: 700px;
+    }
+}
+
+/* Mobile: Nearly full width */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 0 var(--space-12);
+    }
+    
+    .form-container {
+        width: 100%;
+        max-width: none;
+    }
 }
 
 .form-step {
@@ -1166,7 +1210,7 @@ input[type="file"].form-control:hover {
     }
     
     .header {
-        padding: var(--space-16) 0;
+        padding: 0;
     }
     
     .header h1 {
