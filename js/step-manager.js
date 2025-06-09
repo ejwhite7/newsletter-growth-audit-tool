@@ -69,19 +69,15 @@ const StepManager = {
   },
 
   async nextStep() {
-    console.log(`StepManager: nextStep() called from step ${this.currentStep}`);
     this.stepInteractions.button_clicks++;
 
     if (FormValidator.validateCurrentStep()) {
-      console.log('StepManager: Validation passed, proceeding to next step');
       DataCollector.collectStepData(this.currentStep);
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
-        console.log(`StepManager: Loading step ${this.currentStep}`);
         await this.loadStep(this.currentStep);
       }
     } else {
-      console.log('StepManager: Validation failed, staying on current step');
       this.stepInteractions.validation_errors++;
     }
   },
