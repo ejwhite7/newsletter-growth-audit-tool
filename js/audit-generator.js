@@ -784,36 +784,8 @@ const AuditGenerator = {
   loadChilipiperWidget(formData) {
     const container = document.getElementById('chilipiper-container');
     if (container) {
-      // Helper function to escape HTML attributes
-      const escapeHtml = text => {
-        if (!text) return '';
-        return text
-          .toString()
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
-      };
-
-      // Create the Chilipiper container with hidden form and widget area
+      // Create the Chilipiper container with a widget area
       container.innerHTML = `
-                <!-- Hidden form for ChiliPiper to read from -->
-                <form id="chilipiper-form" style="display: none;">
-                    <input type="text" name="firstName" value="${escapeHtml(formData.firstName)}" />
-                    <input type="text" name="lastName" value="${escapeHtml(formData.lastName)}" />
-                    <input type="email" name="email" value="${escapeHtml(formData.email)}" />
-                    <input type="text" name="subscribers" value="${escapeHtml(formData.customSubscriberCount || formData.subscriberCount)}" />
-                    <input type="text" name="platform" value="${escapeHtml(formData.platform)}" />
-                    <input type="text" name="name" value="${escapeHtml(formData.newsletterName)}" />
-                    <input type="text" name="website" value="${escapeHtml(formData.archiveLink)}" />
-                    <input type="text" name="source" value="newsletter_audit_tool_enterprise" />
-                    <input type="text" name="monthlyRevenue" value="${escapeHtml(formData.customMonthlyRevenue || formData.monthlyRevenue)}" />
-                    <input type="text" name="teamSize" value="${escapeHtml(formData.teamSize)}" />
-                    <input type="text" name="openRate" value="${escapeHtml(formData.openRate)}" />
-                    <input type="text" name="clickRate" value="${escapeHtml(formData.clickRate)}" />
-                </form>
-                
                 <div id="chilipiper-booking-widget" style="
                     height: 650px; 
                     width: 100%; 
@@ -879,12 +851,33 @@ const AuditGenerator = {
             loadingElement.style.display = 'none';
           }
 
-          // Deploy ChiliPiper with proper configuration
-          if (window.ChiliPiper?.deploy) {
-            window.ChiliPiper.deploy('beehiiv', 'inbound-router', {
-              formType: 'HTML',
-              formSelector: '#chilipiper-form',
+          // Programmatically submit data to ChiliPiper to show the calendar
+          if (window.ChiliPiper?.submit) {
+            const leadData = {
+              firstName: formData.firstName || '',
+              lastName: formData.lastName || '',
+              email: formData.email || '',
+              subscribers: formData.customSubscriberCount || formData.subscriberCount || '',
+              platform: formData.platform || '',
+              name: formData.newsletterName || '',
+              website: formData.archiveLink || '',
+              source: 'newsletter_audit_tool_enterprise',
+              monthlyRevenue: formData.customMonthlyRevenue || formData.monthlyRevenue || '',
+              teamSize: formData.teamSize || '',
+              openRate: formData.openRate || '',
+              clickRate: formData.clickRate || '',
+            };
+
+            window.ChiliPiper.submit('beehiiv', 'inbound-router', {
+              lead: leadData,
               containerSelector: '#chilipiper-booking-widget',
+              onSuccess: () => {
+                console.log('ChiliPiper calendar loaded successfully.');
+              },
+              onError: () => {
+                console.error('ChiliPiper failed to load calendar, showing fallback.');
+                this.showChilipiperFallback(formData);
+              },
             });
           } else {
             this.showChilipiperFallback(formData);
@@ -893,7 +886,7 @@ const AuditGenerator = {
           console.error('Error deploying ChiliPiper:', error);
           this.showChilipiperFallback(formData);
         }
-      }, 1000); // Wait 1 second for ChiliPiper to fully initialize
+      }, 500); // Wait 0.5s for ChiliPiper to fully initialize
     };
 
     script.onerror = error => {
