@@ -155,7 +155,7 @@ window.updateFollowingDisplay = value => {
 
 // PDF Download functionality
 window.downloadAudit = () => {
-  cioanalytics.track('Audit Printed');
+  cioanalytics.track('Audit Printed', {}, { timestamp: new Date() });
   // Implement PDF download functionality
   const auditContent = document.getElementById('auditContent');
   const formData = DataCollector.getFormData();

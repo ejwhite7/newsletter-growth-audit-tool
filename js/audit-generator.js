@@ -4,10 +4,11 @@ const AuditGenerator = {
   async generateAudit() {
     if (FormValidator.validateCurrentStep()) {
       const step5Data = DataCollector.collectStepData(StepManager.currentStep);
-      cioanalytics.track('Audit Step 5 Completed', step5Data);
+      const now = new Date();
+      cioanalytics.track('Audit Step 5 Completed', step5Data, { timestamp: now });
 
       const formData = DataCollector.getFormData();
-      cioanalytics.track('Audit Generation Started', formData);
+      cioanalytics.track('Audit Generation Started', formData, { timestamp: now });
 
       // Check if user has 100,000+ subscribers - show Chilipiper instead
       const actualSubscriberCount = formData.customSubscriberCount || formData.subscriberCount;
@@ -24,10 +25,14 @@ const AuditGenerator = {
         const auditContent = await this.generateAIAudit();
         this.hideLoading();
 
-        cioanalytics.track('Audit Generation Completed', {
-          success: true,
-          chili_piper_shown: this.shouldShowChilipiper(actualSubscriberCount),
-        });
+        cioanalytics.track(
+          'Audit Generation Completed',
+          {
+            success: true,
+            chili_piper_shown: this.shouldShowChilipiper(actualSubscriberCount),
+          },
+          { timestamp: new Date() }
+        );
 
         // If AI generation failed, auditContent will be null
         // displayAuditReport will handle this and show the fallback template
@@ -35,10 +40,14 @@ const AuditGenerator = {
       } catch (error) {
         console.error('Error generating audit:', error);
         this.hideLoading();
-        cioanalytics.track('Audit Generation Completed', {
-          success: false,
-          error: error.message,
-        });
+        cioanalytics.track(
+          'Audit Generation Completed',
+          {
+            success: false,
+            error: error.message,
+          },
+          { timestamp: new Date() }
+        );
         this.displayErrorMessage(error.message);
       }
     }
@@ -422,7 +431,7 @@ const AuditGenerator = {
       const beehiivLink = auditContent.querySelector('a[href="https://app.beehiiv.com"]');
       if (beehiivLink) {
         beehiivLink.addEventListener('click', () => {
-          cioanalytics.track('Clicked to beehiiv from Audit');
+          cioanalytics.track('Clicked to beehiiv from Audit', {}, { timestamp: new Date() });
         });
       }
     }

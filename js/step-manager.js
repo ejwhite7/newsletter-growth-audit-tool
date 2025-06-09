@@ -61,16 +61,19 @@ const StepManager = {
 
     if (FormValidator.validateCurrentStep()) {
       const stepData = DataCollector.collectStepData(this.currentStep);
+      const now = new Date();
+      const timestamp = Math.floor(now.getTime() / 1000);
 
       // Identify user to Customer.io on the first step
       if (this.currentStep === 1 && stepData.email) {
         cioanalytics.identify(stepData.email, {
           firstName: stepData.firstName,
-          lastName: stepData.lastName
+          lastName: stepData.lastName,
+          created_at: timestamp,
         });
       }
 
-      cioanalytics.track(`Audit Step ${this.currentStep} Completed`, stepData);
+      cioanalytics.track(`Audit Step ${this.currentStep} Completed`, stepData, { timestamp: now });
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
         await this.loadStep(this.currentStep);
