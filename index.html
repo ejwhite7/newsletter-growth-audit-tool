@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter Growth Audit - Get Your Free Analysis</title>
+    <meta name="description" content="Get a comprehensive audit of your newsletter with AI-powered recommendations for growth, monetization, and optimization.">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://api.anthropic.com">
+    <link rel="preconnect" href="https://track.customer.io">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.js"></script>
+    
+    <!-- Customer.io Analytics -->
+    <script type="text/javascript">
+    (function() {
+        var cio = window.cio = window.cio || [];
+        if (navigator.doNotTrack != "1") {
+            (function(b,o,n,g,s,r,c){if(b[s])return;b[s]={};b[s].q=[];c=o.createElement(n);
+            c.async=1;c.src=g;r=o.getElementsByTagName(n)[0];r.parentNode.insertBefore(c,r);
+            })(window,document,"script","https://assets.customer.io/assets/track.js","cio");
+        }
+    })();
+    </script>
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app">
+        <!-- Header Section -->
+        <div id="header-container"></div>
+        
+        <!-- Progress Bar -->
+        <div id="progress-container"></div>
+        
+        <!-- Main Content Area -->
+        <div class="main-container">
+            <!-- Step Content Container -->
+            <div id="step-container"></div>
+            
+            <!-- Audit Results Container -->
+            <div id="audit-container" style="display: none;"></div>
+        </div>
+        
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" style="display: none;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Generating your personalized audit...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/schemas.js"></script>
+    <script src="js/customer-io-tracker.js"></script>
+    <script src="js/component-loader.js"></script>
+    <script src="js/progress-manager.js"></script>
+    <script src="js/data-collector.js"></script>
+    <script src="js/form-validator.js"></script>
+    <script src="js/step-manager.js"></script>
+    <script src="js/audit-generator.js"></script>
+    
+    <!-- Main Application Logic -->
+    <script src="app.js"></script>
+</body>
+</html> 

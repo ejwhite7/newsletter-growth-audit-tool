@@ -2,31 +2,37 @@
   "name": "newsletter-growth-audit",
   "version": "1.0.0",
   "description": "Newsletter Growth Audit Tool with AI-powered recommendations",
-  "main": "index.html",
   "scripts": {
     "start": "node api-proxy.js",
-    "dev": "nodemon api-proxy.js"
+    "dev": "nodemon api-proxy.js",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "biome:check": "biome check .",
+    "biome:lint": "biome lint .",
+    "biome:format": "biome format . --write",
+    "biome:fix": "biome check . --write",
+    "format": "biome format . --write"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "node-fetch": "^2.6.7",
-    "dotenv": "^16.3.1"
+    "zod": "^3.25.56"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1",
     "nodemon": "^3.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": [
-    "newsletter",
-    "growth",
-    "audit",
-    "ai",
-    "anthropic",
-    "vercel"
-  ],
+  "keywords": ["newsletter", "growth", "audit", "ai", "anthropic", "vercel"],
   "author": "Your Name",
   "license": "MIT"
-} 
+}
