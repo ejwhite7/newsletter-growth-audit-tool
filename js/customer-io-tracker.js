@@ -4,21 +4,20 @@ const CustomerIOTracker = {
   // Generate a unique audit ID for grouping
   auditId: null,
   userId: null,
+  trackingQueue: [],
 
   // Initialize tracking with user identification
   identifyUser(userData) {
+    // Always set userId regardless of Customer.io state
+    this.userId = userData.email;
+
     if (window.cioanalyticsUnavailable) {
-      this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
 
     if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
-      this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
-
-    // Set userId as the user's email
-    this.userId = userData.email;
 
     try {
       // Identify user with PII using correct syntax
@@ -48,15 +47,17 @@ const CustomerIOTracker = {
 
   // Track step completion with form data
   trackStepCompletion(stepNumber, stepData) {
+    if (!this.userId) {
+      return;
+    }
+
     if (window.cioanalyticsUnavailable) {
       return;
     }
 
     if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
-      return;
-    }
-
-    if (!this.userId) {
+      // Queue the tracking for when Customer.io loads
+      this.queueTracking('trackStepCompletion', [stepNumber, stepData]);
       return;
     }
 
@@ -600,6 +601,25 @@ const CustomerIOTracker = {
   },
 
   // Track page visibility changes for abandonment detection
+  // Queue tracking calls when Customer.io isn't ready yet
+  queueTracking(methodName, args) {
+    this.trackingQueue.push({ method: methodName, args: args });
+  },
+
+  // Process queued tracking calls when Customer.io becomes available
+  processTrackingQueue() {
+    if (this.trackingQueue.length === 0) return;
+
+    const queue = [...this.trackingQueue];
+    this.trackingQueue = [];
+
+    queue.forEach(({ method, args }) => {
+      if (this[method]) {
+        this[method](...args);
+      }
+    });
+  },
+
   initializeAbandonmentTracking() {
     let isFormStarted = false;
 
@@ -632,6 +652,17 @@ const CustomerIOTracker = {
         }
       }
     });
+
+    // Check periodically if Customer.io has loaded and process queue
+    const checkCustomerIO = setInterval(() => {
+      if (window.cioanalytics && !Array.isArray(window.cioanalytics)) {
+        this.processTrackingQueue();
+        clearInterval(checkCustomerIO);
+      }
+    }, 1000);
+
+    // Clear interval after 30 seconds to avoid infinite checking
+    setTimeout(() => clearInterval(checkCustomerIO), 30000);
   },
 };
 
