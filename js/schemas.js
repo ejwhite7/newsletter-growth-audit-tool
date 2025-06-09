@@ -1,18 +1,12 @@
 // Zod schemas for newsletter audit form validation
 // Note: This assumes Zod is loaded via CDN in the HTML
 
-// Check if Zod is available
-if (typeof z === 'undefined') {
-  // eslint-disable-next-line no-console
-  console.warn('Zod not available, using basic validation fallbacks');
-}
+// Zod availability will be checked when needed
 
 const ZodValidation = {
   // Initialize schemas when Zod is available
   init() {
     if (typeof z === 'undefined') {
-      // eslint-disable-next-line no-console
-      console.warn('Zod not available, using basic validation');
       return false;
     }
 
@@ -245,14 +239,7 @@ const ZodValidation = {
 
 // Initialize when DOM is ready or immediately if already ready
 function initializeZodValidation() {
-  const success = ZodValidation.init();
-  if (success) {
-    // eslint-disable-next-line no-console
-    console.log('Zod validation initialized successfully');
-  } else {
-    // eslint-disable-next-line no-console
-    console.warn('Using basic validation fallbacks');
-  }
+  ZodValidation.init();
 }
 
 // Try to initialize immediately
@@ -260,19 +247,26 @@ function tryInitialize() {
   if (typeof z !== 'undefined') {
     initializeZodValidation();
   } else {
-    // eslint-disable-next-line no-console
-    console.warn('Zod not available, using basic validation fallbacks');
     // Still initialize with basic validation
     ZodValidation.init();
   }
 }
 
-// Try multiple times to initialize
-tryInitialize();
-document.addEventListener('DOMContentLoaded', tryInitialize);
+// Initialize once when DOM is ready
+let initialized = false;
+function initializeOnce() {
+  if (!initialized) {
+    initialized = true;
+    tryInitialize();
+  }
+}
 
-// Also try after a delay in case Zod loads async
-setTimeout(tryInitialize, 1000);
+// Try to initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeOnce);
+} else {
+  initializeOnce();
+}
 
 // Make available globally
 window.ZodValidation = ZodValidation;
