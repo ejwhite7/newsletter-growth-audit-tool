@@ -787,7 +787,7 @@ const AuditGenerator = {
       // Create the Chilipiper container with a widget area
       container.innerHTML = `
                 <div id="chilipiper-booking-widget" style="
-                    height: 600px; 
+                    height: 550px; 
                     width: 100%; 
                     max-width: none;
                     border-radius: var(--radius-lg); 
@@ -795,7 +795,7 @@ const AuditGenerator = {
                     border: 1px solid var(--color-border); 
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     position: relative;
-                    overflow: auto;
+                    overflow: hidden;
                     z-index: 1;
                 ">
                     <div class="loading-chilipiper" style="text-align: center; padding: var(--space-32);">
@@ -816,23 +816,6 @@ const AuditGenerator = {
     if (existingScript) {
       existingScript.remove();
     }
-
-    // Remove previous style override if it exists
-    const existingOverride = document.getElementById('chilipiper-style-override');
-    if (existingOverride) {
-      existingOverride.remove();
-    }
-
-    // Add a style override to fix the max-width issue from the global stylesheet
-    const styleOverride = document.createElement('style');
-    styleOverride.id = 'chilipiper-style-override';
-    // This targets the iframe ChiliPiper creates to undo the aggressive max-width rule.
-    styleOverride.innerHTML = `
-      #chilipiper-booking-widget iframe {
-        max-width: none !important;
-      }
-    `;
-    document.head.appendChild(styleOverride);
 
     // Create script element
     const script = document.createElement('script');
