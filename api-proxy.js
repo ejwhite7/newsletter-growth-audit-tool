@@ -54,12 +54,15 @@ app.post('/api/generate-audit', async (req, res) => {
     const data = await response.json();
     res.json({ content: data.content[0].text });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error generating audit:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`Server running on http://localhost:${PORT}`);
+  // eslint-disable-next-line no-console
   console.log('Make sure to set ANTHROPIC_API_KEY in your environment variables');
 });

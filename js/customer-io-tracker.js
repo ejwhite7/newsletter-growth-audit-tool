@@ -1,4 +1,5 @@
 // Customer.io Tracking Module
+/* eslint-disable no-console */
 const CustomerIOTracker = {
   // Generate a unique audit ID for grouping
   auditId: null,
@@ -6,23 +7,18 @@ const CustomerIOTracker = {
 
   // Initialize tracking with user identification
   identifyUser(userData) {
-    console.log('Identifying user:', userData);
-    
     if (window.cioanalyticsUnavailable) {
-      console.log('Customer.io unavailable, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
 
     if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
-      console.log('Customer.io not ready, setting userId internally only');
       this.userId = userData.email; // Still set userId for internal tracking
       return;
     }
 
     // Set userId as the user's email
     this.userId = userData.email;
-    console.log('Setting userId:', this.userId);
 
     try {
       // Identify user with PII using correct syntax
@@ -34,7 +30,6 @@ const CustomerIOTracker = {
         createdAt: new Date().toISOString(),
         source: 'newsletter_audit_tool',
       });
-      console.log('Customer.io identify call successful');
     } catch (error) {
       console.error('Customer.io identify call failed:', error);
     }
@@ -54,17 +49,14 @@ const CustomerIOTracker = {
   // Track step completion with form data
   trackStepCompletion(stepNumber, stepData) {
     if (window.cioanalyticsUnavailable) {
-      console.log('Customer.io tracking unavailable');
       return;
     }
 
     if (!window.cioanalytics || Array.isArray(window.cioanalytics)) {
-      console.log('Customer.io not loaded or not initialized');
       return;
     }
 
     if (!this.userId) {
-      console.log('No userId set for tracking');
       return;
     }
 
@@ -86,7 +78,6 @@ const CustomerIOTracker = {
     };
 
     try {
-      console.log(`Tracking ${eventName}:`, trackData);
       window.cioanalytics.track(eventName, trackData);
     } catch (error) {
       console.error('Customer.io track call failed:', error);

@@ -1,4 +1,5 @@
 // Audit Generator Module
+/* eslint-disable no-console */
 const AuditGenerator = {
   async generateAudit() {
     if (FormValidator.validateCurrentStep()) {
@@ -365,12 +366,12 @@ const AuditGenerator = {
     if (formContainer) {
       formContainer.classList.add('hidden');
     }
-    
+
     // Show the audit component container
     if (auditComponent) {
       auditComponent.style.display = 'block';
     }
-    
+
     // Show the audit container within the component
     if (auditContainer) {
       auditContainer.classList.remove('hidden');

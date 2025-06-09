@@ -1,4 +1,5 @@
 // Component Loader Module
+/* eslint-disable no-console */
 const ComponentLoader = {
   async loadComponent(componentPath, targetElementId) {
     try {

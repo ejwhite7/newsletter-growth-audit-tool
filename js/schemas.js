@@ -3,6 +3,7 @@
 
 // Check if Zod is available
 if (typeof z === 'undefined') {
+  // eslint-disable-next-line no-console
   console.warn('Zod not available, using basic validation fallbacks');
 }
 
@@ -10,6 +11,7 @@ const ZodValidation = {
   // Initialize schemas when Zod is available
   init() {
     if (typeof z === 'undefined') {
+      // eslint-disable-next-line no-console
       console.warn('Zod not available, using basic validation');
       return false;
     }
@@ -245,8 +247,10 @@ const ZodValidation = {
 function initializeZodValidation() {
   const success = ZodValidation.init();
   if (success) {
+    // eslint-disable-next-line no-console
     console.log('Zod validation initialized successfully');
   } else {
+    // eslint-disable-next-line no-console
     console.warn('Using basic validation fallbacks');
   }
 }
@@ -256,6 +260,7 @@ function tryInitialize() {
   if (typeof z !== 'undefined') {
     initializeZodValidation();
   } else {
+    // eslint-disable-next-line no-console
     console.warn('Zod not available, using basic validation fallbacks');
     // Still initialize with basic validation
     ZodValidation.init();
