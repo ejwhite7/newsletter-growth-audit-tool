@@ -815,16 +815,15 @@ const AuditGenerator = {
                 </form>
                 
                 <div id="chilipiper-booking-widget" style="
-                    min-height: 600px; 
+                    height: 650px; 
                     width: 100%; 
-                    max-width: 100%;
-                    padding: var(--space-16); 
+                    max-width: none;
                     border-radius: var(--radius-lg); 
                     background: var(--color-surface); 
                     border: 1px solid var(--color-border); 
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     position: relative;
-                    overflow: visible;
+                    overflow: auto;
                     z-index: 1;
                 ">
                     <div class="loading-chilipiper" style="text-align: center; padding: var(--space-32);">
