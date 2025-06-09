@@ -61,7 +61,7 @@ const StepManager = {
 
     if (FormValidator.validateCurrentStep()) {
       const stepData = DataCollector.collectStepData(this.currentStep);
-      analytics.track(`Audit Step ${this.currentStep} Completed`, stepData);
+      cioanalytics.track(`Audit Step ${this.currentStep} Completed`, stepData);
       if (this.currentStep < this.totalSteps) {
         this.currentStep++;
         await this.loadStep(this.currentStep);

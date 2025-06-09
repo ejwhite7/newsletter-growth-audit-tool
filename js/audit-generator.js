@@ -4,10 +4,10 @@ const AuditGenerator = {
   async generateAudit() {
     if (FormValidator.validateCurrentStep()) {
       const step5Data = DataCollector.collectStepData(StepManager.currentStep);
-      analytics.track('Audit Step 5 Completed', step5Data);
+      cioanalytics.track('Audit Step 5 Completed', step5Data);
 
       const formData = DataCollector.getFormData();
-      analytics.track('Audit Generation Started', formData);
+      cioanalytics.track('Audit Generation Started', formData);
 
       // Check if user has 100,000+ subscribers - show Chilipiper instead
       const actualSubscriberCount = formData.customSubscriberCount || formData.subscriberCount;
@@ -24,7 +24,7 @@ const AuditGenerator = {
         const auditContent = await this.generateAIAudit();
         this.hideLoading();
 
-        analytics.track('Audit Generation Completed', {
+        cioanalytics.track('Audit Generation Completed', {
           success: true,
           chili_piper_shown: this.shouldShowChilipiper(actualSubscriberCount),
         });
@@ -35,7 +35,7 @@ const AuditGenerator = {
       } catch (error) {
         console.error('Error generating audit:', error);
         this.hideLoading();
-        analytics.track('Audit Generation Completed', {
+        cioanalytics.track('Audit Generation Completed', {
           success: false,
           error: error.message,
         });
@@ -422,7 +422,7 @@ const AuditGenerator = {
       const beehiivLink = auditContent.querySelector('a[href="https://app.beehiiv.com"]');
       if (beehiivLink) {
         beehiivLink.addEventListener('click', () => {
-          analytics.track('Clicked to beehiiv from Audit');
+          cioanalytics.track('Clicked to beehiiv from Audit');
         });
       }
     }
