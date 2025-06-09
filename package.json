@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "description": "Newsletter Growth Audit Tool with AI-powered recommendations",
   "scripts": {
-    "start": "node api-proxy.js",
-    "dev": "nodemon api-proxy.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix",
     "biome:check": "biome check .",
