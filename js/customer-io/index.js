@@ -203,5 +203,29 @@ class CustomerIOTracker {
 }
 
 // Create and export a single instance for browser use
-const customerIOTracker = new CustomerIOTracker();
-window.CustomerIOTracker = customerIOTracker;
+// Add error handling for initialization
+try {
+  const customerIOTracker = new CustomerIOTracker();
+  window.CustomerIOTracker = customerIOTracker;
+} catch (error) {
+  console.error('Failed to initialize CustomerIOTracker:', error);
+  // Create a minimal fallback object to prevent errors
+  window.CustomerIOTracker = {
+    initializeAbandonmentTracking: () => {},
+    identifyUser: () => {},
+    trackStepCompletion: () => {},
+    trackStepTiming: () => {},
+    trackFieldInteraction: () => {},
+    trackAuditGenerationStart: () => {},
+    trackAuditCompletion: () => {},
+    trackAuditDownload: () => {},
+    trackEnterpriseUser: () => {},
+    trackSocialMediaAnalysis: () => {},
+    trackEngagementPattern: () => {},
+    trackPlatformMigrationPotential: () => {},
+    trackChilipiperWidgetLoad: () => {},
+    trackChilipiperSchedulingAttempt: () => {},
+    trackChilipiperFallback: () => {},
+    trackFormAbandonment: () => {}
+  };
+}

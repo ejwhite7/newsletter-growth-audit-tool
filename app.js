@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Initialize Customer.io abandonment tracking
-  if (window.CustomerIOTracker) {
+  if (window.CustomerIOTracker && typeof window.CustomerIOTracker.initializeAbandonmentTracking === 'function') {
     CustomerIOTracker.initializeAbandonmentTracking();
   }
 
