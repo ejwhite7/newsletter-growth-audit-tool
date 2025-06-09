@@ -6,18 +6,7 @@ window.nextStep = () => StepManager.nextStep();
 window.prevStep = () => StepManager.prevStep();
 window.generateAudit = () => AuditGenerator.generateAudit();
 
-// Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize abandonment tracking
-  if (window.CustomerIOTracker) {
-    CustomerIOTracker.initializeAbandonmentTracking();
-  }
-
-  // Initialize component loading
-  if (window.ComponentLoader) {
-    ComponentLoader.loadAllComponents();
-  }
-});
+// Note: Main initialization is handled at the bottom of this file
 
 // Custom input toggle functions
 window.toggleCustomSubscriberInput = () => {
@@ -416,6 +405,8 @@ window.AuditGenerator = AuditGenerator;
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOM loaded, starting initialization...');
+  
   if (window.cioanalytics) {
     // Test basic functionality
     try {
@@ -426,14 +417,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Initialize Customer.io abandonment tracking
-  CustomerIOTracker.initializeAbandonmentTracking();
+  if (window.CustomerIOTracker) {
+    CustomerIOTracker.initializeAbandonmentTracking();
+  }
 
   // Load all static components
-  await ComponentLoader.loadAllComponents();
+  console.log('Loading static components...');
+  if (window.ComponentLoader) {
+    await ComponentLoader.loadAllComponents();
+  }
 
   // Load the first step
-  await StepManager.loadStep(1);
+  console.log('Loading first step...');
+  if (window.StepManager) {
+    await StepManager.loadStep(1);
+    console.log('First step loaded successfully');
+  } else {
+    console.error('StepManager not available');
+  }
 
   // Initialize progress
-  ProgressManager.updateProgress(1, StepManager.totalSteps);
+  if (window.ProgressManager) {
+    ProgressManager.updateProgress(1, StepManager.totalSteps);
+  }
+  
+  console.log('Initialization complete');
 });
