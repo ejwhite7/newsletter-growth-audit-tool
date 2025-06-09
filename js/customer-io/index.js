@@ -202,30 +202,53 @@ class CustomerIOTracker {
   }
 }
 
-// Create and export a single instance for browser use
-// Add error handling for initialization
-try {
-  const customerIOTracker = new CustomerIOTracker();
-  window.CustomerIOTracker = customerIOTracker;
-} catch (error) {
-  console.error('Failed to initialize CustomerIOTracker:', error);
-  // Create a minimal fallback object to prevent errors
-  window.CustomerIOTracker = {
-    initializeAbandonmentTracking: () => {},
-    identifyUser: () => {},
-    trackStepCompletion: () => {},
-    trackStepTiming: () => {},
-    trackFieldInteraction: () => {},
-    trackAuditGenerationStart: () => {},
-    trackAuditCompletion: () => {},
-    trackAuditDownload: () => {},
-    trackEnterpriseUser: () => {},
-    trackSocialMediaAnalysis: () => {},
-    trackEngagementPattern: () => {},
-    trackPlatformMigrationPotential: () => {},
-    trackChilipiperWidgetLoad: () => {},
-    trackChilipiperSchedulingAttempt: () => {},
-    trackChilipiperFallback: () => {},
-    trackFormAbandonment: () => {}
-  };
+// Initialize CustomerIOTracker when Customer.io analytics is ready
+function initializeCustomerIOTracker() {
+  try {
+    const customerIOTracker = new CustomerIOTracker();
+    window.CustomerIOTracker = customerIOTracker;
+  } catch (error) {
+    console.error('Failed to initialize CustomerIOTracker:', error);
+    // Create a minimal fallback object to prevent errors
+    window.CustomerIOTracker = {
+      initializeAbandonmentTracking: () => {},
+      identifyUser: () => {},
+      trackStepCompletion: () => {},
+      trackStepTiming: () => {},
+      trackFieldInteraction: () => {},
+      trackAuditGenerationStart: () => {},
+      trackAuditCompletion: () => {},
+      trackAuditDownload: () => {},
+      trackEnterpriseUser: () => {},
+      trackSocialMediaAnalysis: () => {},
+      trackEngagementPattern: () => {},
+      trackPlatformMigrationPotential: () => {},
+      trackChilipiperWidgetLoad: () => {},
+      trackChilipiperSchedulingAttempt: () => {},
+      trackChilipiperFallback: () => {},
+      trackFormAbandonment: () => {}
+    };
+  }
+}
+
+// Wait for Customer.io analytics to be ready
+if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
+  // Customer.io is loaded, use ready callback
+  window.cioanalytics.ready(initializeCustomerIOTracker);
+} else {
+  // Customer.io not loaded yet, wait for it
+  const checkCustomerIO = setInterval(() => {
+    if (window.cioanalytics && typeof window.cioanalytics.ready === 'function') {
+      clearInterval(checkCustomerIO);
+      window.cioanalytics.ready(initializeCustomerIOTracker);
+    }
+  }, 100);
+
+  // Fallback: initialize after 5 seconds regardless
+  setTimeout(() => {
+    clearInterval(checkCustomerIO);
+    if (!window.CustomerIOTracker) {
+      initializeCustomerIOTracker();
+    }
+  }, 5000);
 }
