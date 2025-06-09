@@ -9,6 +9,26 @@ class CustomerIOTracker {
     // In browser environment, classes are loaded via script tags
     // No need for require() - they're available on window object
 
+    // Check if dependencies are available
+    if (!window.CustomerIOCore) {
+      throw new Error('CustomerIOCore not available');
+    }
+    if (!window.CustomerIOUtils) {
+      throw new Error('CustomerIOUtils not available');
+    }
+    if (!window.StepTracker) {
+      throw new Error('StepTracker not available');
+    }
+    if (!window.AuditTracker) {
+      throw new Error('AuditTracker not available');
+    }
+    if (!window.BusinessTracker) {
+      throw new Error('BusinessTracker not available');
+    }
+    if (!window.ChiliPiperTracker) {
+      throw new Error('ChiliPiperTracker not available');
+    }
+
     // Initialize core and utils
     this.core = new window.CustomerIOCore();
     this.utils = window.CustomerIOUtils;
