@@ -209,22 +209,22 @@ const AuditGenerator = {
       ctaTitle = '🚀 Maximize Your beehiiv Experience';
       if (segment === 'starter') {
         ctaMessage =
-          "You're on the best platform with huge growth potential ahead. Let beehiiv's team help you unlock advanced growth strategies.";
+          "You're on the best platform with huge growth potential ahead. Let beehiiv's team help you unlock advanced growth strategies."; // eslint-disable-line quotes
       } else if (segment === 'growing') {
         ctaMessage =
-          "You've built solid momentum on beehiiv - now let our experts help you scale strategically with advanced features.";
+          "You've built solid momentum on beehiiv - now let our experts help you scale strategically with advanced features."; // eslint-disable-line quotes
       } else if (segment === 'established') {
         ctaMessage =
           'Your newsletter is performing well on beehiiv - let our growth experts help you optimize for maximum impact.';
       } else {
         ctaMessage =
-          "You've built an impressive newsletter empire on beehiiv - let our team help you take it to the next level.";
+          "You've built an impressive newsletter empire on beehiiv - let our team help you take it to the next level."; // eslint-disable-line quotes
       }
       ctaButton = 'Get Started';
     } else {
       ctaTitle = '🚀 Ready to Supercharge Your Growth?';
       ctaMessage =
-        "This audit shows significant opportunities for growth. Join thousands of successful creators who've switched to beehiiv - the platform built specifically for newsletter growth.";
+        "This audit shows significant opportunities for growth. Join thousands of successful creators who've switched to beehiiv - the platform built specifically for newsletter growth."; // eslint-disable-line quotes
       ctaButton = 'Get Started';
     }
 
@@ -310,7 +310,7 @@ const AuditGenerator = {
     const circumference = 2 * Math.PI * 52; // radius = 52
     const duration = 120000; // 2 minutes in milliseconds
     const stepDuration = duration / 5; // Duration per step
-    const _updateInterval = 100; // Update every 100ms for smooth animation
+    // const _updateInterval = 100; // Update every 100ms for smooth animation
 
     const startTime = Date.now();
     let currentStep = 0;
@@ -359,11 +359,19 @@ const AuditGenerator = {
 
   hideLoading() {
     const formContainer = document.getElementById('formContainer');
+    const auditComponent = document.getElementById('auditComponent');
     const auditContainer = document.getElementById('auditContainer');
 
     if (formContainer) {
       formContainer.classList.add('hidden');
     }
+    
+    // Show the audit component container
+    if (auditComponent) {
+      auditComponent.style.display = 'block';
+    }
+    
+    // Show the audit container within the component
     if (auditContainer) {
       auditContainer.classList.remove('hidden');
     }
