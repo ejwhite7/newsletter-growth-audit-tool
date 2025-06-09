@@ -787,7 +787,7 @@ const AuditGenerator = {
       // Create the Chilipiper container with a widget area
       container.innerHTML = `
                 <div id="chilipiper-booking-widget" style="
-                    height: 650px; 
+                    height: 600px; 
                     width: 100%; 
                     max-width: none;
                     border-radius: var(--radius-lg); 
@@ -851,8 +851,10 @@ const AuditGenerator = {
             loadingElement.style.display = 'none';
           }
 
+          const bookingWidget = document.getElementById('chilipiper-booking-widget');
+
           // Programmatically submit data to ChiliPiper to show the calendar
-          if (window.ChiliPiper?.submit) {
+          if (window.ChiliPiper?.submit && bookingWidget) {
             const leadData = {
               firstName: formData.firstName || '',
               lastName: formData.lastName || '',
@@ -870,7 +872,7 @@ const AuditGenerator = {
 
             window.ChiliPiper.submit('beehiiv', 'inbound-router', {
               lead: leadData,
-              containerSelector: '#chilipiper-booking-widget',
+              domElement: bookingWidget,
               onSuccess: () => {
                 console.log('ChiliPiper calendar loaded successfully.');
               },
@@ -880,6 +882,9 @@ const AuditGenerator = {
               },
             });
           } else {
+            if (!bookingWidget) {
+              console.error('Could not find ChiliPiper container: #chilipiper-booking-widget');
+            }
             this.showChilipiperFallback(formData);
           }
         } catch (error) {
