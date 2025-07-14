@@ -388,6 +388,9 @@ const AuditGenerator = {
     if (auditContainer) {
       auditContainer.classList.remove('hidden');
     }
+    
+    // Send height to parent frame
+    setTimeout(() => window.sendIframeHeight(), 100);
   },
 
   displayAuditReport(aiGeneratedContent = null) {

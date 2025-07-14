@@ -6,7 +6,29 @@ window.nextStep = () => StepManager.nextStep();
 window.prevStep = () => StepManager.prevStep();
 window.generateAudit = () => AuditGenerator.generateAudit();
 
+// Simple iframe height function
+window.sendIframeHeight = () => {
+  if (window.parent && window.parent !== window) {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({
+      type: 'iframeHeight',
+      height: height + 50
+    }, '*');
+  }
+};
+
 // Note: Main initialization is handled at the bottom of this file
+
+// Simple iframe height function
+window.sendIframeHeight = () => {
+  if (window.parent && window.parent !== window) {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({
+      type: 'iframeHeight',
+      height: height + 50
+    }, '*');
+  }
+};
 
 // Custom input toggle functions
 window.toggleCustomSubscriberInput = () => {
