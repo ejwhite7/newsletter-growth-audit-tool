@@ -4,7 +4,7 @@
   --color-surface: rgba(255, 255, 255, 1);
   --color-text: rgba(0, 0, 0, 1);
   --color-text-secondary: rgba(107, 114, 126, 1);
-  --color-primary: rgba(47, 57, 186, 1); /* Custom blue #2F39BA */
+  --color-primary: rgba(56, 67, 208, 1); /* Custom blue #3843D0 */
   --color-primary-hover: rgba(37, 45, 149, 1);
   --color-primary-active: rgba(29, 35, 119, 1);
   --color-secondary: rgba(255, 255, 255, 1);
@@ -36,8 +36,16 @@
   --color-info-rgb: 59, 130, 246;
 
   /* Typography */
-  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-base: "Satoshi",
+  system-ui,
+  -apple-system,
+  "Segoe UI",
+  Roboto,
+  Helvetica,
+  Arial,
+  sans-serif,
+  "Apple Color Emoji",
+  "Segoe UI Emoji";
   --font-family-mono: "Berkeley Mono", ui-monospace, SFMono-Regular, Menlo,
     Monaco, Consolas, monospace;
   --font-size-xs: 11px;
@@ -72,6 +80,7 @@
   --space-32: 32px;
 
   /* Border Radius */
+  --radius-xsm: 4px;
   --radius-sm: 6px;
   --radius-base: 8px;
   --radius-md: 10px;
@@ -351,7 +360,7 @@ pre code {
   color: var(--color-text);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-base);
+  border-radius: var(--radius-xsm);
   transition: border-color var(--duration-fast) var(--ease-standard),
     box-shadow var(--duration-fast) var(--ease-standard);
 }
@@ -408,23 +417,23 @@ select.form-control {
 /* Card component */
 .card {
   background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-base);
   border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: box-shadow var(--duration-normal) var(--ease-standard);
+  box-shadow: 6px 6px;  
 }
 
 .card.chilipiper-card {
   overflow: visible;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
 .card__body {
   padding: var(--space-16);
+}
+
+.card__body h2{
+ padding-bottom: 8px;
 }
 
 .card__header,
