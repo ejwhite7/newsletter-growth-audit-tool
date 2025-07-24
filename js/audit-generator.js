@@ -11,8 +11,8 @@ const AuditGenerator = {
       cioanalytics.track('Audit Generation Started', formData, { timestamp: now });
 
       // Check if user has 100,000+ subscribers - show Chilipiper instead
-      const actualSubscriberCount = formData.customSubscriberCount || formData.subscriberCount;
-      if (this.shouldShowChilipiper(actualSubscriberCount)) {
+      // Exception: beehiiv users never see ChiliPiper, regardless of subscriber count
+      if (this.shouldShowChilipiper(formData)) {
         this.showChilipiperScheduling(formData);
         return;
       }
@@ -29,7 +29,7 @@ const AuditGenerator = {
           'Audit Generation Completed',
           {
             success: true,
-            chili_piper_shown: this.shouldShowChilipiper(actualSubscriberCount),
+            chili_piper_shown: this.shouldShowChilipiper(formData),
           },
           { timestamp: new Date() }
         );
@@ -725,8 +725,14 @@ const AuditGenerator = {
             </div>`;
   },
 
-  shouldShowChilipiper(subscriberCount) {
+  shouldShowChilipiper(formData) {
+    // beehiiv users never see ChiliPiper, regardless of subscriber count
+    if (formData.platform && formData.platform.toLowerCase() === 'beehiiv') {
+      return false;
+    }
+
     // Check if subscriber count indicates 100,000+ subscribers
+    const subscriberCount = formData.customSubscriberCount || formData.subscriberCount;
     if (!subscriberCount) return false;
 
     // Handle custom numeric input
